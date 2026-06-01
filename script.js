@@ -206,10 +206,21 @@ const state = {
   paymentMethod: 'apple-pay'
 };
 
+const themePalettes = [
+  { id: 'classic', label: 'النحاسي' },
+  { id: 'emerald', label: 'الزمردي' },
+  { id: 'royal', label: 'الملكي' },
+  { id: 'rose', label: 'الوردي' }
+];
+
 const app = document.getElementById('app');
 const toast = document.getElementById('toast');
 const navLinks = document.getElementById('navLinks');
 const menuToggle = document.getElementById('menuToggle');
+const themeToggle = document.getElementById('themeToggle');
+const themeToggleLabel = document.getElementById('themeToggleLabel');
+
+applyTheme(getSavedTheme(), false);
 
 function getSavedResumes() {
   const saved = localStorage.getItem('rawaj_resumes');
@@ -272,6 +283,28 @@ function showToast(message) {
   toast.classList.add('show');
   clearTimeout(showToast.timer);
   showToast.timer = setTimeout(() => toast.classList.remove('show'), 2600);
+}
+
+function getSavedTheme() {
+  const savedTheme = localStorage.getItem('rawaj_theme_palette') || 'classic';
+  return themePalettes.some(theme => theme.id === savedTheme) ? savedTheme : 'classic';
+}
+
+function applyTheme(themeId, shouldSave = true) {
+  const theme = themePalettes.find(item => item.id === themeId) || themePalettes[0];
+  document.body.dataset.theme = theme.id;
+  if (themeToggleLabel) themeToggleLabel.textContent = `ألوان ${theme.label}`;
+  themeToggle?.setAttribute('aria-label', `تغيير ألوان القالب - الحالي ${theme.label}`);
+  if (shouldSave) localStorage.setItem('rawaj_theme_palette', theme.id);
+  return theme;
+}
+
+function toggleThemePalette() {
+  const currentTheme = getSavedTheme();
+  const currentIndex = themePalettes.findIndex(theme => theme.id === currentTheme);
+  const nextTheme = themePalettes[(currentIndex + 1) % themePalettes.length];
+  applyTheme(nextTheme.id);
+  showToast(`تم تطبيق ألوان ${nextTheme.label}`);
 }
 
 function navigate(path) {
@@ -1016,5 +1049,6 @@ menuToggle?.addEventListener('click', () => {
   const open = navLinks.classList.toggle('open');
   menuToggle.setAttribute('aria-expanded', String(open));
 });
+themeToggle?.addEventListener('click', toggleThemePalette);
 
 document.addEventListener('DOMContentLoaded', render);
