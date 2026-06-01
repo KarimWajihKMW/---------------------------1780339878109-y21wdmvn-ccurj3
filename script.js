@@ -13,6 +13,74 @@ const templates = [
   { id: 'academic-minaret', name: 'مئذنة الأكاديمي', category: 'أكاديمي', tone: 'منظم', popularity: 84, accent: '#5b4c9a', pages: 'صفحتان', desc: 'يعرض الأبحاث، المنشورات، والمؤتمرات بهرمية علمية.', tags: ['أبحاث', 'تعليم', 'منشورات'] }
 ];
 
+templates.push(
+  { id: 'legal-crest', name: 'شعار القانون', category: 'قانوني', tone: 'رسمي', popularity: 86, accent: '#3f2f5f', pages: 'صفحتان', desc: 'هيكلة دقيقة للمحامين والمستشارين مع إبراز القضايا والتراخيص.', tags: ['قانون', 'تراخيص', 'استشارات'] },
+  { id: 'engineering-grid', name: 'شبكة المهندس', category: 'هندسي', tone: 'تقني', popularity: 92, accent: '#425466', pages: 'صفحتان', desc: 'يعرض المشاريع الهندسية والأدوات والمخططات بترتيب واضح.', tags: ['مشاريع', 'تصميم', 'سلامة'] },
+  { id: 'teacher-lantern', name: 'فانوس المعلّم', category: 'تعليم', tone: 'ودود', popularity: 85, accent: '#c27a25', pages: 'صفحة واحدة', desc: 'قالب دافئ للمعلمين والمدربين يركز على الأثر التعليمي.', tags: ['تعليم', 'طلاب', 'مناهج'] },
+  { id: 'hospitality-oasis', name: 'واحة الضيافة', category: 'ضيافة', tone: 'راقي', popularity: 83, accent: '#0f766e', pages: 'صفحة واحدة', desc: 'مثالي للفنادق والمطاعم وخدمة العملاء مع إبراز معايير الخدمة.', tags: ['خدمة', 'فنادق', 'تجربة'] },
+  { id: 'hr-compass', name: 'بوصلة الموارد', category: 'موارد بشرية', tone: 'منظم', popularity: 90, accent: '#8b5cf6', pages: 'صفحتان', desc: 'يعرض التوظيف، التطوير، وسياسات الموارد البشرية بشكل مهني.', tags: ['توظيف', 'تطوير', 'سياسات'] }
+);
+
+templates.push(
+  { id: 'marketing-spark', name: 'شرارة التسويق', category: 'تسويق', tone: 'جريء', popularity: 96, accent: '#e11d48', pages: 'صفحة واحدة', desc: 'قالب ديناميكي للحملات والنمو وقنوات التسويق الرقمي.', tags: ['حملات', 'نمو', 'محتوى'] },
+  { id: 'operations-flow', name: 'تدفق العمليات', category: 'عمليات', tone: 'عملي', popularity: 89, accent: '#2563eb', pages: 'صفحتان', desc: 'يبرز تحسين العمليات، سلاسل الإمداد، ورفع الكفاءة.', tags: ['تشغيل', 'كفاءة', 'إمداد'] },
+  { id: 'project-radar', name: 'رادار المشاريع', category: 'إدارة مشاريع', tone: 'منظم', popularity: 93, accent: '#7c3aed', pages: 'صفحتان', desc: 'للمديرين ومالكي المنتجات مع محاور للميزانيات والمخاطر والنتائج.', tags: ['PMO', 'مخاطر', 'نتائج'] },
+  { id: 'ux-canvas', name: 'لوحة تجربة المستخدم', category: 'تصميم', tone: 'إبداعي', popularity: 91, accent: '#db2777', pages: 'صفحة واحدة', desc: 'يوازن بين البحث، النماذج الأولية، وقياس تجربة المستخدم.', tags: ['UX', 'بحث', 'نماذج'] },
+  { id: 'data-lighthouse', name: 'منارة البيانات', category: 'بيانات', tone: 'تحليلي', popularity: 95, accent: '#0891b2', pages: 'صفحتان', desc: 'يركز على لوحات المؤشرات، النمذجة، والقرارات المدفوعة بالبيانات.', tags: ['BI', 'تحليل', 'نمذجة'] }
+);
+
+templates.push(
+  { id: 'security-shield', name: 'درع الأمن السيبراني', category: 'أمن سيبراني', tone: 'حازم', popularity: 94, accent: '#111827', pages: 'صفحتان', desc: 'قالب قوي لشهادات الأمن، الاستجابة للحوادث، وإدارة المخاطر.', tags: ['SOC', 'حماية', 'مخاطر'] },
+  { id: 'product-nova', name: 'نوفا المنتج', category: 'منتجات', tone: 'حديث', popularity: 96, accent: '#f97316', pages: 'صفحتان', desc: 'مصمم لمديري المنتجات مع مساحة للرؤية، المقاييس، وخارطة الطريق.', tags: ['منتج', 'Roadmap', 'مقاييس'] },
+  { id: 'customer-heart', name: 'قلب العملاء', category: 'خدمة العملاء', tone: 'ودود', popularity: 84, accent: '#16a34a', pages: 'صفحة واحدة', desc: 'يعرض رضا العملاء، حل المشكلات، وتجارب الدعم متعددة القنوات.', tags: ['دعم', 'رضا', 'حلول'] },
+  { id: 'media-studio', name: 'استوديو الإعلام', category: 'إعلام', tone: 'إبداعي', popularity: 88, accent: '#9333ea', pages: 'صفحة واحدة', desc: 'للمذيعين والمحررين وصناع الفيديو مع إبراز الأعمال المنشورة.', tags: ['إنتاج', 'تحرير', 'ظهور'] },
+  { id: 'ngo-impact', name: 'أثر المبادرات', category: 'غير ربحي', tone: 'إنساني', popularity: 82, accent: '#65a30d', pages: 'صفحتان', desc: 'يركز على الأثر المجتمعي، الشراكات، وإدارة المتطوعين.', tags: ['أثر', 'تطوع', 'شراكات'] }
+);
+
+templates.push(
+  { id: 'real-estate-tower', name: 'برج العقار', category: 'عقاري', tone: 'موثوق', popularity: 85, accent: '#92400e', pages: 'صفحة واحدة', desc: 'يناسب المبيعات العقارية وإدارة الأملاك وتطوير المحافظ.', tags: ['عقار', 'محافظ', 'مبيعات'] },
+  { id: 'logistics-route', name: 'مسار اللوجستيات', category: 'لوجستيات', tone: 'عملي', popularity: 87, accent: '#0369a1', pages: 'صفحتان', desc: 'قالب لسلاسل التوريد، النقل، التخطيط، وخفض التكاليف.', tags: ['نقل', 'توريد', 'تكلفة'] },
+  { id: 'retail-shelf', name: 'رف التجزئة', category: 'تجزئة', tone: 'نشط', popularity: 83, accent: '#be123c', pages: 'صفحة واحدة', desc: 'يعرض إدارة الفروع، المبيعات، المخزون، وتجربة المتسوق.', tags: ['متاجر', 'مخزون', 'مبيعات'] },
+  { id: 'chef-signature', name: 'توقيع الشيف', category: 'طهي', tone: 'راقي', popularity: 80, accent: '#b45309', pages: 'صفحة واحدة', desc: 'قالب بصري للطهاة وفِرق المطابخ مع قوائم الإنجازات والمطابخ.', tags: ['مطابخ', 'قوائم', 'جودة'] },
+  { id: 'aviation-wing', name: 'جناح الطيران', category: 'طيران', tone: 'دقيق', popularity: 81, accent: '#0284c7', pages: 'صفحتان', desc: 'للمضيفين والطيارين وعمليات الطيران مع إبراز السلامة والاعتمادات.', tags: ['سلامة', 'اعتمادات', 'رحلات'] }
+);
+
+templates.push(
+  { id: 'energy-horizon', name: 'أفق الطاقة', category: 'طاقة', tone: 'مستقبلي', popularity: 86, accent: '#ca8a04', pages: 'صفحتان', desc: 'مصمم للطاقة المتجددة والنفط والغاز مع مؤشرات الأداء البيئي.', tags: ['طاقة', 'استدامة', 'مشاريع'] },
+  { id: 'architecture-line', name: 'خط المعمار', category: 'عمارة', tone: 'فني', popularity: 90, accent: '#64748b', pages: 'صفحة واحدة', desc: 'قالب أنيق للمعماريين يعرض البرامج، المشاريع، والجوائز.', tags: ['تصميم', 'مشاريع', 'جوائز'] },
+  { id: 'pharma-lab', name: 'مختبر الدواء', category: 'صيدلة', tone: 'دقيق', popularity: 84, accent: '#0e7490', pages: 'صفحتان', desc: 'يرتب الخبرة الصيدلانية، الاعتمادات، والأبحاث السريرية.', tags: ['صيدلة', 'مختبر', 'أبحاث'] },
+  { id: 'nursing-care', name: 'رعاية التمريض', category: 'تمريض', tone: 'هادئ', popularity: 88, accent: '#14b8a6', pages: 'صفحة واحدة', desc: 'يعرض الرعاية السريرية، المناوبات، المهارات، والتراخيص الصحية.', tags: ['تمريض', 'رعاية', 'ترخيص'] },
+  { id: 'lab-scientist', name: 'العالم الباحث', category: 'بحث علمي', tone: 'أكاديمي', popularity: 82, accent: '#4f46e5', pages: 'صفحتان', desc: 'للباحثين مع أقسام للمنح، المنشورات، والمنهجيات.', tags: ['منح', 'منشورات', 'منهجية'] }
+);
+
+templates.push(
+  { id: 'sports-coach', name: 'مدرب الأداء', category: 'رياضة', tone: 'حماسي', popularity: 79, accent: '#dc2626', pages: 'صفحة واحدة', desc: 'للمدربين واللاعبين مع إبراز البطولات وخطط الأداء.', tags: ['رياضة', 'بطولات', 'أداء'] },
+  { id: 'translation-bridge', name: 'جسر الترجمة', category: 'ترجمة', tone: 'دقيق', popularity: 78, accent: '#7c2d12', pages: 'صفحة واحدة', desc: 'يعرض اللغات، التخصصات، أدوات الترجمة، وعينات العمل.', tags: ['لغات', 'تحرير', 'CAT'] },
+  { id: 'admin-pearl', name: 'لؤلؤة الإدارة', category: 'إداري', tone: 'منظم', popularity: 86, accent: '#7f1d1d', pages: 'صفحة واحدة', desc: 'قالب للإداريين والمساعدين التنفيذيين مع تنظيم للمهام والإنجازات.', tags: ['تنسيق', 'مكاتب', 'متابعة'] },
+  { id: 'startup-rocket', name: 'صاروخ الشركات الناشئة', category: 'ريادة أعمال', tone: 'جريء', popularity: 92, accent: '#ea580c', pages: 'صفحتان', desc: 'يعرض بناء الفرق، جذب العملاء، والنتائج في بيئات سريعة النمو.', tags: ['Startup', 'نمو', 'تمويل'] },
+  { id: 'consulting-matrix', name: 'مصفوفة الاستشارات', category: 'استشارات', tone: 'رسمي', popularity: 93, accent: '#334155', pages: 'صفحتان', desc: 'قالب للاستشاريين يبرز القطاعات، الأطر التحليلية، وأثر المشاريع.', tags: ['تحليل', 'قطاعات', 'أثر'] }
+);
+
+templates.push(
+  { id: 'banking-marble', name: 'رخام المصرفية', category: 'مصرفي', tone: 'فاخر', popularity: 89, accent: '#1e3a8a', pages: 'صفحتان', desc: 'للمصرفيين ومديري العلاقات مع إبراز الامتثال والمحافظ.', tags: ['مصرفية', 'امتثال', 'محافظ'] },
+  { id: 'insurance-anchor', name: 'مرساة التأمين', category: 'تأمين', tone: 'موثوق', popularity: 80, accent: '#0f4c5c', pages: 'صفحة واحدة', desc: 'يركز على المطالبات، الاكتتاب، وإدارة علاقات العملاء.', tags: ['مطالبات', 'اكتتاب', 'عملاء'] },
+  { id: 'qa-prism', name: 'منشور الجودة', category: 'جودة', tone: 'دقيق', popularity: 87, accent: '#6d28d9', pages: 'صفحتان', desc: 'لضمان الجودة والاختبار مع مؤشرات العيوب والتحسين المستمر.', tags: ['QA', 'اختبار', 'تحسين'] },
+  { id: 'devops-cloud', name: 'سحابة DevOps', category: 'تقني', tone: 'حديث', popularity: 94, accent: '#0ea5e9', pages: 'صفحتان', desc: 'يعرض البنية السحابية، الأتمتة، CI/CD، والمراقبة.', tags: ['Cloud', 'CI/CD', 'أتمتة'] },
+  { id: 'ai-lattice', name: 'نسيج الذكاء الاصطناعي', category: 'ذكاء اصطناعي', tone: 'مستقبلي', popularity: 95, accent: '#a855f7', pages: 'صفحتان', desc: 'قالب لمهندسي التعلم الآلي وعلوم البيانات مع إبراز النماذج والنتائج.', tags: ['AI', 'ML', 'نماذج'] }
+);
+
+templates.push(
+  { id: 'ecommerce-market', name: 'سوق التجارة الرقمية', category: 'تجارة إلكترونية', tone: 'نشط', popularity: 90, accent: '#f59e0b', pages: 'صفحة واحدة', desc: 'يعرض المتاجر، التحويل، الحملات، وإدارة المنتجات الرقمية.', tags: ['متجر', 'تحويل', 'منتجات'] },
+  { id: 'social-campaign', name: 'حملة التواصل', category: 'تواصل اجتماعي', tone: 'جريء', popularity: 88, accent: '#ec4899', pages: 'صفحة واحدة', desc: 'مناسب لمديري الحسابات والمؤثرين مع مساحة للنتائج والمجتمعات.', tags: ['Social', 'مجتمع', 'نتائج'] },
+  { id: 'event-majlis', name: 'مجلس الفعاليات', category: 'فعاليات', tone: 'راقي', popularity: 82, accent: '#a16207', pages: 'صفحتان', desc: 'ينظم الخبرات في تخطيط الفعاليات، الموردين، والميزانيات.', tags: ['فعاليات', 'موردين', 'ميزانيات'] },
+  { id: 'interior-harmony', name: 'تناغم الديكور', category: 'تصميم داخلي', tone: 'فني', popularity: 81, accent: '#9a3412', pages: 'صفحة واحدة', desc: 'قالب للمصممين الداخليين يعرض الأسلوب، البرامج، والمشاريع.', tags: ['ديكور', '3D', 'مشاريع'] },
+  { id: 'public-sector-seal', name: 'ختم القطاع العام', category: 'حكومي', tone: 'رسمي', popularity: 85, accent: '#14532d', pages: 'صفحتان', desc: 'مصمم للقطاع العام مع إبراز المبادرات، الحوكمة، والامتثال.', tags: ['حوكمة', 'مبادرات', 'امتثال'] }
+);
+
+templates.push(
+  { id: 'manufacturing-line', name: 'خط التصنيع', category: 'تصنيع', tone: 'عملي', popularity: 84, accent: '#475569', pages: 'صفحتان', desc: 'يركز على الإنتاجية، السلامة، الصيانة، وتقليل الهدر.', tags: ['إنتاج', 'سلامة', 'صيانة'] }
+);
+
 const plans = [
   { name: 'التجربة الأولى', price: 'مجاني', desc: 'أول سيرة ذاتية مجانية بالكامل لتبدأ بثقة.', items: ['سيرة ذاتية واحدة مجاناً', 'قالبان احترافيان', 'تعديل غير محدود على السيرة الأولى', 'تصدير نص منسق'] },
   { name: 'المحترف', price: '49 ر.س', desc: 'بعد السيرة الأولى، أنشئ سيراً إضافية عبر دفع آمن.', items: ['كل القوالب', 'سير إضافية مدفوعة', 'مراجعة ذكية للنص', 'الدفع عبر Apple Pay أو البطاقة'], featured: true },
@@ -159,7 +227,7 @@ function homePage() {
           <a class="secondary-btn" href="/templates" data-link>استعرض القوالب</a>
         </div>
         <div class="hero-metrics">
-          <div class="metric-card"><strong>9+</strong><span>قوالب مهنية متنوعة</span></div>
+          <div class="metric-card"><strong>50+</strong><span>قالباً مهنياً متنوعاً</span></div>
           <div class="metric-card"><strong>3D</strong><span>تجربة تفاعلية عميقة</span></div>
           <div class="metric-card"><strong>24/7</strong><span>حفظ وتعديل من أي مكان</span></div>
         </div>
@@ -326,7 +394,10 @@ function textarea(label, name, value) {
 }
 
 function dashboardPage() {
-  let resumes = getSavedResumes();
+  const allResumes = getSavedResumes();
+  const previewPromptId = localStorage.getItem('rawaj_last_saved_resume');
+  const previewPromptResume = allResumes.find(r => r.id === previewPromptId);
+  let resumes = allResumes;
   resumes = resumes.filter(r => `${r.name} ${r.role} ${r.status}`.includes(state.dashboardSearch));
   resumes.sort((a,b) => state.dashboardSort === 'name' ? a.name.localeCompare(b.name, 'ar') : (b.updatedAt || 0) - (a.updatedAt || 0));
   const perPage = 5;
@@ -338,6 +409,10 @@ function dashboardPage() {
       <div><span class="eyebrow">لوحة السير المحفوظة</span><h2>إدارة كاملة لكل نسخ سيرتك الذاتية.</h2></div>
       <a class="primary-btn" href="/builder" data-link>إنشاء سيرة جديدة</a>
     </div>
+    ${previewPromptResume ? `<div class="save-preview-banner reveal">
+      <div><strong>تم حفظ السيرة بنجاح</strong><span>يمكنك الآن تمكين المعاينة الاحترافية لسيرة ${escapeHtml(previewPromptResume.name)} قبل التعديل أو التصدير.</span></div>
+      <div class="action-row"><button class="primary-btn" data-action="preview-resume" data-id="${previewPromptResume.id}">تمكين المعاينة</button><button class="ghost-btn" data-action="clear-preview-prompt">لاحقاً</button></div>
+    </div>` : ''}
     <div class="filters reveal" style="grid-template-columns:minmax(220px,1fr) 220px">
       <input class="control" id="dashboardSearch" placeholder="ابحث بالاسم أو المسمى أو الحالة..." value="${state.dashboardSearch}">
       <select class="control" id="dashboardSort"><option value="updated" ${state.dashboardSort==='updated'?'selected':''}>الأحدث تعديلاً</option><option value="name" ${state.dashboardSort==='name'?'selected':''}>حسب الاسم</option></select>
@@ -345,7 +420,7 @@ function dashboardPage() {
     <article class="table-card reveal">
       <div class="table-wrap">
         <table>
-          <thead><tr><th>الاسم</th><th>المسمى</th><th>القالب</th><th>الحالة</th><th>آخر تعديل</th><th>إجراءات CRUD</th></tr></thead>
+          <thead><tr><th>الاسم</th><th>المسمى</th><th>القالب</th><th>الحالة</th><th>آخر تعديل</th><th>إجراءات CRUD والمعاينة</th></tr></thead>
           <tbody>
             ${paged.map(r => `<tr>
               <td><strong>${escapeHtml(r.name)}</strong></td>
@@ -353,13 +428,42 @@ function dashboardPage() {
               <td>${templates.find(t=>t.id===r.template)?.name || 'قالب روَاج'}</td>
               <td><span class="status-pill ${r.status==='مسودة'?'draft':''}">${r.status}</span></td>
               <td>${formatDate(r.updatedAt)}</td>
-              <td><div class="action-row"><button class="mini-btn" data-action="edit-resume" data-id="${r.id}">تعديل</button><button class="mini-btn" data-action="duplicate-resume" data-id="${r.id}">تكرار</button><button class="mini-btn" data-action="delete-resume" data-id="${r.id}">حذف</button></div></td>
+              <td><div class="action-row"><button class="mini-btn" data-action="preview-resume" data-id="${r.id}">معاينة</button><button class="mini-btn" data-action="edit-resume" data-id="${r.id}">تعديل</button><button class="mini-btn" data-action="duplicate-resume" data-id="${r.id}">تكرار</button><button class="mini-btn" data-action="delete-resume" data-id="${r.id}">حذف</button></div></td>
             </tr>`).join('') || `<tr><td colspan="6"><div class="empty-state">لا توجد سير محفوظة مطابقة. أنشئ سيرة جديدة لتظهر هنا.</div></td></tr>`}
           </tbody>
         </table>
       </div>
       ${pagination(pages, state.dashboardPage, 'dashboard-page')}
     </article>
+  `);
+}
+
+function savedPreviewPage(id) {
+  const resume = getSavedResumes().find(r => r.id === id);
+  if (!resume) return notFoundPage();
+  const template = templates.find(t => t.id === resume.template) || templates[0];
+  localStorage.removeItem('rawaj_last_saved_resume');
+  return pageShell(`
+    <div class="section-head reveal">
+      <div><span class="eyebrow">معاينة السيرة المحفوظة</span><h2>${escapeHtml(resume.name)}</h2></div>
+      <div class="hero-actions"><a class="secondary-btn" href="/builder/${resume.id}" data-link>تعديل السيرة</a><a class="primary-btn" href="/dashboard" data-link>العودة للوحة</a></div>
+    </div>
+    <div class="saved-preview-layout">
+      <article class="resume-preview-page reveal" style="--accent:${template.accent}">
+        <div class="preview-paper saved-paper">${resumeDocumentHtml(resume)}</div>
+      </article>
+      <aside class="panel reveal">
+        <span class="eyebrow">القالب المفعّل</span>
+        <h3>${template.name}</h3>
+        <p class="lead">${template.desc}</p>
+        <div class="values-grid" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+          <div class="value-card"><strong>المجال</strong><p>${template.category}</p></div>
+          <div class="value-card"><strong>النبرة</strong><p>${template.tone}</p></div>
+          <div class="value-card"><strong>الرواج</strong><p>${template.popularity}%</p></div>
+          <div class="value-card"><strong>الصفحات</strong><p>${template.pages}</p></div>
+        </div>
+      </aside>
+    </div>
   `);
 }
 
@@ -435,6 +539,7 @@ function render() {
   else if (path === '/builder') app.innerHTML = builderPage();
   else if (parts[0] === 'builder' && parts[1]) app.innerHTML = builderPage(parts[1]);
   else if (path === '/dashboard') app.innerHTML = dashboardPage();
+  else if (parts[0] === 'preview' && parts[1]) app.innerHTML = savedPreviewPage(parts[1]);
   else if (path === '/pricing') app.innerHTML = pricingPage();
   else if (path === '/checkout') app.innerHTML = checkoutPage();
   else if (path === '/about') app.innerHTML = aboutPage();
@@ -498,6 +603,8 @@ function handleAction(event) {
   if (action === 'dashboard-page') { state.dashboardPage = page; render(); return; }
   if (action === 'payment-method') { state.paymentMethod = event.currentTarget.dataset.method; render(); return; }
   if (action === 'complete-apple-pay') { completeCheckout('apple-pay'); return; }
+  if (action === 'clear-preview-prompt') { localStorage.removeItem('rawaj_last_saved_resume'); render(); return; }
+  if (action === 'preview-resume') { navigate(`/preview/${id}`); return; }
   if (action === 'edit-resume') { navigate(`/builder/${id}`); return; }
   const resumes = getSavedResumes();
   const resume = resumes.find(r => r.id === id);
@@ -520,6 +627,7 @@ function handleAction(event) {
     const ok = confirm('هل تريد حذف هذه السيرة من لوحة روَاج؟');
     if (!ok) return;
     saveResumes(resumes.filter(r => r.id !== id));
+    if (localStorage.getItem('rawaj_last_saved_resume') === id) localStorage.removeItem('rawaj_last_saved_resume');
     showToast('تم حذف السيرة');
     render();
   }
@@ -530,10 +638,14 @@ function updatePreview() {
   const preview = document.getElementById('resumePreview');
   if (!form || !preview) return;
   const data = Object.fromEntries(new FormData(form));
-  const skills = (data.skills || '').split('،').join(',').split(',').map(s => s.trim()).filter(Boolean);
   const template = templates.find(t => t.id === data.template) || templates[0];
   preview.style.borderTop = `10px solid ${template.accent}`;
-  preview.innerHTML = `
+  preview.innerHTML = resumeDocumentHtml(data);
+}
+
+function resumeDocumentHtml(data) {
+  const skills = (data.skills || '').split('،').join(',').split(',').map(s => s.trim()).filter(Boolean);
+  return `
     <h3>${escapeHtml(data.name || 'اسمك الكامل')}</h3>
     <div class="preview-role">${escapeHtml(data.role || 'مسمى وظيفي')}</div>
     <p>${escapeHtml(data.email || '')} · ${escapeHtml(data.phone || '')} · ${escapeHtml(data.city || '')}</p>
@@ -562,7 +674,8 @@ function saveResumeFromForm(event) {
   else resumes.unshift(record);
   if (isNewResume && !isPaymentActive()) markFreeResumeUsed();
   saveResumes(resumes);
-  showToast(isNewResume && !isPaymentActive() ? 'تم حفظ سيرتك المجانية الأولى' : 'تم حفظ السيرة في لوحة روَاج');
+  localStorage.setItem('rawaj_last_saved_resume', id);
+  showToast(isNewResume && !isPaymentActive() ? 'تم حفظ سيرتك المجانية الأولى — المعاينة متاحة الآن' : 'تم حفظ السيرة — يمكنك تمكين المعاينة الآن');
   navigate('/dashboard');
 }
 
@@ -576,8 +689,9 @@ function completeCheckout(method) {
     if (index >= 0) resumes[index] = record;
     else resumes.unshift(record);
     saveResumes(resumes);
+    localStorage.setItem('rawaj_last_saved_resume', record.id);
     localStorage.removeItem('rawaj_pending_resume');
-    showToast(`تم الدفع عبر ${method === 'apple-pay' ? 'Apple Pay' : 'البطاقة'} وحفظ السيرة`);
+    showToast(`تم الدفع عبر ${method === 'apple-pay' ? 'Apple Pay' : 'البطاقة'} وحفظ السيرة؛ المعاينة متاحة الآن`);
     navigate('/dashboard');
     return;
   }
