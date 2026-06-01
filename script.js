@@ -553,6 +553,7 @@ function builderPage(editId = '') {
     </div>
     <div class="builder-layout">
       <article class="form-card reveal">
+        ${aiAssistantBuilderCard()}
         <form class="builder-form" id="resumeForm">
           <input type="hidden" name="id" value="${data.id}">
           <div class="form-grid">
@@ -574,6 +575,27 @@ function builderPage(editId = '') {
       <aside class="resume-preview reveal"><div class="preview-paper" id="resumePreview"></div></aside>
     </div>
   `);
+}
+
+function aiAssistantBuilderCard() {
+  return `
+    <div class="ai-assistant-card">
+      <div class="ai-assistant-head">
+        <span class="ai-badge">AI</span>
+        <div>
+          <strong>مساعد روَاج الذكي</strong>
+          <small>يصيغ ملخصاً وإنجازات ومهارات مقترحة من بياناتك الحالية.</small>
+        </div>
+      </div>
+      <div class="ai-actions">
+        <button class="mini-btn" type="button" data-action="ai-write-summary">اقتراح ملخص</button>
+        <button class="mini-btn" type="button" data-action="ai-write-experience">تحسين الخبرات</button>
+        <button class="mini-btn" type="button" data-action="ai-write-skills">اقتراح مهارات</button>
+        <button class="mini-btn ai-primary" type="button" data-action="ai-improve-all">تحسين الكل</button>
+      </div>
+      <div class="ai-output" id="aiAssistantOutput">املأ الاسم والمسمى وبعض الخبرات، ثم استخدم الذكاء الاصطناعي لتوليد نسخة مهنية قابلة للتعديل.</div>
+    </div>
+  `;
 }
 
 function field(label, name, value, type = 'text') {
@@ -654,6 +676,32 @@ function savedPreviewPage(id) {
         </div>
       </aside>
     </div>
+  `);
+}
+
+function aiPage() {
+  return pageShell(`
+    <section class="ai-hero reveal">
+      <div>
+        <span class="eyebrow">ذكاء اصطناعي عربي للسيرة الذاتية</span>
+        <h2>حوّل بياناتك إلى صياغة مهنية جاهزة للتخصيص.</h2>
+        <p class="lead">يدعمك مساعد روَاج الذكي داخل منشئ السيرة باقتراح ملخص احترافي، تحويل الخبرات إلى إنجازات قابلة للقياس، وترتيب المهارات حسب المسمى الوظيفي.</p>
+        <div class="hero-actions"><a class="primary-btn" href="/builder" data-link>جرّب المساعد في المنشئ</a><a class="secondary-btn" href="/templates" data-link>اختر قالباً أولاً</a></div>
+      </div>
+      <div class="ai-console parallax-card" data-depth="10">
+        <div class="ai-console-top"><span></span><span></span><span></span></div>
+        <div class="ai-line wide"></div><div class="ai-line"></div><div class="ai-line short"></div>
+        <div class="ai-suggestion"><strong>اقتراح ذكي</strong><p>قُد مشاريعك بصياغة تبرز الأثر، الأرقام، والكلمات المفتاحية المناسبة لأنظمة الفرز.</p></div>
+      </div>
+    </section>
+    <section class="reveal" style="margin-top:60px">
+      <div class="section-head"><div><span class="eyebrow">ما الذي يفعله؟</span><h2>مساعدة فورية دون مغادرة صفحة الإنشاء.</h2></div></div>
+      <div class="grid-3">
+        ${featureCard('🧠','صياغة الملخص','يبني ملخصاً مختصراً يربط المسمى والخبرة بالقيمة التي تقدمها لصاحب العمل.')}
+        ${featureCard('📈','تحويل المهام إلى إنجازات','يعيد كتابة الخبرات بنبرة إنجازات قابلة للقياس ومناسبة للفرز السريع.')}
+        ${featureCard('🎯','مهارات وكلمات مفتاحية','يقترح مهارات مرتبطة بالمجال لتقوية ظهور السيرة أمام مسؤولي التوظيف.')}
+      </div>
+    </section>
   `);
 }
 
@@ -788,6 +836,7 @@ function render() {
   else if (parts[0] === 'builder' && parts[1]) app.innerHTML = builderPage(parts[1]);
   else if (path === '/dashboard') app.innerHTML = dashboardPage();
   else if (parts[0] === 'preview' && parts[1]) app.innerHTML = savedPreviewPage(parts[1]);
+  else if (path === '/ai') app.innerHTML = aiPage();
   else if (path === '/pricing') app.innerHTML = pricingPage();
   else if (path === '/checkout') app.innerHTML = checkoutPage();
   else if (path === '/receipt') app.innerHTML = paymentReceiptPage();
@@ -848,6 +897,10 @@ function handleAction(event) {
   const action = event.currentTarget.dataset.action;
   const page = Number(event.currentTarget.dataset.page);
   const id = event.currentTarget.dataset.id;
+  if (action === 'ai-write-summary') { suggestResumeContent('summary'); return; }
+  if (action === 'ai-write-experience') { suggestResumeContent('experience'); return; }
+  if (action === 'ai-write-skills') { suggestResumeContent('skills'); return; }
+  if (action === 'ai-improve-all') { suggestResumeContent('all'); return; }
   if (action === 'toggle-template-favorite') {
     const templateId = event.currentTarget.dataset.templateId;
     const isFavorite = toggleTemplateFavorite(templateId);
@@ -888,6 +941,75 @@ function handleAction(event) {
     showToast('تم حذف السيرة');
     render();
   }
+}
+
+function suggestResumeContent(type) {
+  const form = document.getElementById('resumeForm');
+  const output = document.getElementById('aiAssistantOutput');
+  if (!form) return;
+  const data = Object.fromEntries(new FormData(form));
+  const draft = buildAiResumeDraft(data);
+  const applyField = (name, value) => {
+    const field = form.elements[name];
+    if (!field) return;
+    field.value = value;
+    field.dispatchEvent(new Event('input', { bubbles: true }));
+  };
+
+  if (type === 'summary' || type === 'all') applyField('summary', draft.summary);
+  if (type === 'experience' || type === 'all') applyField('experience', draft.experience);
+  if (type === 'skills' || type === 'all') applyField('skills', draft.skills);
+
+  updatePreview();
+  if (output) {
+    const label = type === 'summary' ? 'الملخص المهني' : type === 'experience' ? 'الخبرات' : type === 'skills' ? 'المهارات' : 'كل الأقسام';
+    output.innerHTML = `<strong>تم تحسين ${label}.</strong><span> راجع النص المقترح وعدّله ليطابق أرقامك وخبرتك الفعلية.</span>`;
+  }
+  showToast('تم توليد اقتراح ذكي قابل للتعديل');
+}
+
+function buildAiResumeDraft(data) {
+  const name = (data.name || 'المرشح').trim();
+  const role = (data.role || 'محترف طموح').trim();
+  const city = (data.city || 'السوق المحلي').trim();
+  const baseExperience = (data.experience || '').trim();
+  const baseSkills = (data.skills || '').trim();
+  const profile = getAiRoleProfile(role, `${role} ${baseExperience} ${baseSkills}`);
+  const currentExperience = baseExperience || `إدارة مبادرات مرتبطة بمجال ${role}، تنسيق أصحاب المصلحة، وتحسين جودة المخرجات ضمن مواعيد واضحة.`;
+
+  return {
+    summary: `${name}، ${role} في ${city}، يمتلك قدرة على ${profile.value} مع تركيز على تحويل الأهداف إلى نتائج قابلة للقياس. يجمع بين ${profile.traits} ويبحث عن فرصة يساهم فيها في رفع جودة الأداء وتسريع النمو.`,
+    experience: `• ${profile.action} بما يدعم تحقيق مؤشرات الأداء ورفع كفاءة العمل.\n• ${currentExperience}\n• التعاون مع الفرق المعنية لتحليل المتطلبات، ترتيب الأولويات، وتقديم حلول عملية قابلة للتنفيذ.\n• توثيق النتائج والدروس المستفادة وتحويلها إلى تحسينات مستمرة في سير العمل.`,
+    skills: mergeSkillSuggestions(baseSkills, profile.skills).join('، ')
+  };
+}
+
+function getAiRoleProfile(role, text) {
+  const content = text.toLowerCase();
+  if (/بيانات|data|تحليل|analyst|ذكاء|ai|machine/.test(content)) {
+    return { value: 'تحليل البيانات واستخراج مؤشرات تساعد على اتخاذ القرار', traits: 'التفكير التحليلي، الدقة، وبناء لوحات مؤشرات واضحة', action: 'تحليل مصادر بيانات متعددة واستخلاص فرص تحسين قابلة للتطبيق', skills: ['تحليل البيانات', 'Excel', 'Power BI', 'SQL', 'تصور البيانات', 'حل المشكلات'] };
+  }
+  if (/منتج|product|مشروع|project|scrum/.test(content)) {
+    return { value: 'قيادة المنتجات والمشاريع من الفكرة حتى الإطلاق', traits: 'فهم المستخدم، إدارة الأولويات، وقياس الأثر', action: 'تنسيق خارطة طريق واضحة وربط متطلبات المستخدم بأهداف العمل', skills: ['إدارة المنتجات', 'خرائط الطريق', 'Agile', 'تحليل المتطلبات', 'تجربة المستخدم', 'قياس الأداء'] };
+  }
+  if (/مبيعات|sales|عملاء|customer/.test(content)) {
+    return { value: 'بناء علاقات عملاء وتحويل الفرص إلى نتائج تجارية', traits: 'التفاوض، المتابعة الدقيقة، وفهم احتياجات السوق', action: 'إدارة مسار المبيعات وتحسين تجربة العميل من أول تواصل حتى الإغلاق', skills: ['إدارة العلاقات', 'التفاوض', 'CRM', 'تحليل السوق', 'خدمة العملاء', 'تحقيق الأهداف'] };
+  }
+  if (/تصميم|designer|ux|ui|جرافيك|graphic/.test(content)) {
+    return { value: 'تصميم تجارب ومواد بصرية تخدم الهوية والهدف التجاري', traits: 'الحس البصري، التفكير الإبداعي، والاهتمام بالتفاصيل', action: 'تطوير تصاميم وتجارب مستخدم متناسقة مع الهوية واحتياجات الجمهور', skills: ['تصميم بصري', 'تجربة المستخدم', 'Figma', 'Adobe Creative Suite', 'هوية بصرية', 'نمذجة أولية'] };
+  }
+  if (/تسويق|marketing|محتوى|social|حملات/.test(content)) {
+    return { value: 'تخطيط حملات ومحتوى يزيد الوصول والتحويل', traits: 'الإبداع، قراءة البيانات، وفهم سلوك الجمهور', action: 'إطلاق حملات متعددة القنوات وتحسين الرسائل وفق مؤشرات الأداء', skills: ['التسويق الرقمي', 'كتابة المحتوى', 'SEO', 'إدارة الحملات', 'تحليل الأداء', 'وسائل التواصل'] };
+  }
+  if (/تقنية|developer|برمج|frontend|backend|devops|software/.test(content)) {
+    return { value: 'بناء حلول تقنية مستقرة وقابلة للتوسع', traits: 'حل المشكلات، جودة الكود، والتعلم المستمر', action: 'تطوير مكونات تقنية وتحسين الأداء والاعتمادية بالتعاون مع فرق المنتج', skills: ['JavaScript', 'واجهات برمجة التطبيقات', 'Git', 'اختبار البرمجيات', 'تحسين الأداء', 'أمان التطبيقات'] };
+  }
+  return { value: `تنظيم العمل وتقديم قيمة واضحة في مجال ${role}`, traits: 'التواصل الفعال، المبادرة، والانضباط المهني', action: 'تحسين الإجراءات اليومية وتحويل المهام إلى نتائج واضحة', skills: ['التواصل الفعال', 'إدارة الوقت', 'حل المشكلات', 'العمل الجماعي', 'التخطيط', 'التعلم السريع'] };
+}
+
+function mergeSkillSuggestions(existingSkills, suggestedSkills) {
+  const existing = existingSkills.split('،').join(',').split(',').map(skill => skill.trim()).filter(Boolean);
+  return [...new Set([...suggestedSkills, ...existing])].slice(0, 10);
 }
 
 function updatePreview() {
