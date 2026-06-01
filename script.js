@@ -192,6 +192,27 @@ function saveResumes(resumes) {
   localStorage.setItem('rawaj_resumes', JSON.stringify(resumes));
 }
 
+function getFavoriteTemplates() {
+  const saved = localStorage.getItem('rawaj_favorite_templates');
+  return saved ? JSON.parse(saved) : [];
+}
+
+function saveFavoriteTemplates(favorites) {
+  localStorage.setItem('rawaj_favorite_templates', JSON.stringify(favorites));
+}
+
+function isTemplateFavorite(templateId) {
+  return getFavoriteTemplates().includes(templateId);
+}
+
+function toggleTemplateFavorite(templateId) {
+  const favorites = getFavoriteTemplates();
+  const isFavorite = favorites.includes(templateId);
+  const nextFavorites = isFavorite ? favorites.filter(id => id !== templateId) : [...favorites, templateId];
+  saveFavoriteTemplates(nextFavorites);
+  return !isFavorite;
+}
+
 function isPaymentActive() {
   return localStorage.getItem('rawaj_payment_status') === 'paid';
 }
@@ -332,6 +353,7 @@ function templateCard(t) {
   const avatar = t.avatar || createTemplateAvatar(t);
   const shape = t.shape || 'folio';
   const layout = t.layout || 'stacked';
+  const favorite = isTemplateFavorite(t.id);
   return `<article class="template-card reveal">
     <div class="template-preview">
       <div class="template-mini shape-${shape} layout-${layout}" style="--accent:${t.accent}">
@@ -344,6 +366,10 @@ function templateCard(t) {
       <p>${t.desc}</p>
       <div class="tags">${t.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>
       <div class="action-row">
+        <button class="mini-btn favorite-btn ${favorite ? 'active' : ''}" type="button" data-action="toggle-template-favorite" data-template-id="${t.id}" aria-pressed="${favorite}" aria-label="${favorite ? 'إزالة قالب ' + escapeAttr(t.name) + ' من المفضلة' : 'إضافة قالب ' + escapeAttr(t.name) + ' إلى المفضلة'}">
+          <span aria-hidden="true">${favorite ? '♥' : '♡'}</span>
+          <span>${favorite ? 'في المفضلة' : 'مفضلة'}</span>
+        </button>
         <a class="mini-btn" href="/templates/${t.id}" data-link>تفاصيل القالب</a>
         <a class="mini-btn" href="/builder?template=${t.id}" data-link>استخدامه</a>
       </div>
@@ -737,6 +763,13 @@ function handleAction(event) {
   const action = event.currentTarget.dataset.action;
   const page = Number(event.currentTarget.dataset.page);
   const id = event.currentTarget.dataset.id;
+  if (action === 'toggle-template-favorite') {
+    const templateId = event.currentTarget.dataset.templateId;
+    const isFavorite = toggleTemplateFavorite(templateId);
+    showToast(isFavorite ? 'تمت إضافة القالب إلى المفضلة' : 'تمت إزالة القالب من المفضلة');
+    render();
+    return;
+  }
   if (action === 'template-page') { state.templatePage = page; render(); return; }
   if (action === 'dashboard-page') { state.dashboardPage = page; render(); return; }
   if (action === 'payment-method') { state.paymentMethod = event.currentTarget.dataset.method; render(); return; }
