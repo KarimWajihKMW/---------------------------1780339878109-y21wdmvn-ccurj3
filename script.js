@@ -353,9 +353,9 @@ function toggleThemePalette() {
 
 function navigate(path) {
   const targetUrl = new URL(path, location.origin);
-  if (isBuilderPath(targetUrl.pathname) && !getCurrentUser()) {
+  if (isProtectedPath(targetUrl.pathname) && !getCurrentUser()) {
     localStorage.setItem('rawaj_auth_redirect', `${targetUrl.pathname}${targetUrl.search}`);
-    showToast('سجّل الدخول أولاً لإنشاء السيرة الذاتية');
+    showToast('سجّل الدخول أولاً للوصول إلى لوحة السير أو منشئ السيرة الذاتية');
     history.pushState({}, '', '/auth');
     render();
     return;
@@ -368,10 +368,18 @@ function isBuilderPath(path) {
   return path === '/builder' || path.startsWith('/builder/');
 }
 
+function isDashboardPath(path) {
+  return path === '/dashboard';
+}
+
+function isProtectedPath(path) {
+  return isBuilderPath(path) || isDashboardPath(path);
+}
+
 function consumeAuthRedirect() {
   const redirect = localStorage.getItem('rawaj_auth_redirect');
   localStorage.removeItem('rawaj_auth_redirect');
-  return redirect && isBuilderPath(new URL(redirect, location.origin).pathname) ? redirect : '';
+  return redirect && isProtectedPath(new URL(redirect, location.origin).pathname) ? redirect : '';
 }
 
 function routeLink(html) {
@@ -932,11 +940,12 @@ function contactPage() {
 function loginRequiredPage() {
   const redirectPath = `${location.pathname}${location.search}`;
   localStorage.setItem('rawaj_auth_redirect', redirectPath);
+  const isDashboard = isDashboardPath(location.pathname);
   return pageShell(`
     <article class="panel reveal" style="max-width:760px;margin:auto;text-align:center">
       <span class="eyebrow">تسجيل الدخول مطلوب</span>
-      <h2>سجّل دخولك قبل إنشاء السيرة الذاتية.</h2>
-      <p class="lead" style="margin-inline:auto">حماية إنشاء السير تضمن حفظ بياناتك وقوالبك داخل حساب روَاج، ثم يمكنك العودة مباشرة إلى منشئ السيرة بعد التسجيل.</p>
+      <h2>${isDashboard ? 'سجّل دخولك قبل فتح لوحة السير.' : 'سجّل دخولك قبل إنشاء السيرة الذاتية.'}</h2>
+      <p class="lead" style="margin-inline:auto">${isDashboard ? 'لوحة السير تحتوي على سيرك المحفوظة وإجراءات التعديل والمعاينة، لذلك يجب تسجيل الدخول قبل الوصول إليها.' : 'حماية إنشاء السير تضمن حفظ بياناتك وقوالبك داخل حساب روَاج، ثم يمكنك العودة مباشرة إلى منشئ السيرة بعد التسجيل.'}</p>
       <div class="hero-actions" style="justify-content:center">
         <a class="primary-btn" href="/auth" data-link>تسجيل الدخول أو إنشاء حساب</a>
         <a class="secondary-btn" href="/templates" data-link>استعراض القوالب أولاً</a>
@@ -957,7 +966,7 @@ function render() {
   else if (parts[0] === 'templates' && parts[1]) app.innerHTML = templateDetailPage(parts[1]);
   else if (path === '/builder') app.innerHTML = getCurrentUser() ? builderPage() : loginRequiredPage();
   else if (parts[0] === 'builder' && parts[1]) app.innerHTML = getCurrentUser() ? builderPage(parts[1]) : loginRequiredPage();
-  else if (path === '/dashboard') app.innerHTML = dashboardPage();
+  else if (path === '/dashboard') app.innerHTML = getCurrentUser() ? dashboardPage() : loginRequiredPage();
   else if (parts[0] === 'preview' && parts[1]) app.innerHTML = savedPreviewPage(parts[1]);
   else if (path === '/ai') app.innerHTML = aiPage();
   else if (path === '/pricing') app.innerHTML = pricingPage();
