@@ -1,36 +1,78 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مرحباً بك في أكوادرا</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-      body {
-        font-family: 'Cairo', sans-serif;
-      }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="روَاج منصة عربية احترافية لإنشاء السير الذاتية، حفظها، تعديلها، واختيار قوالب متعددة جاهزة للتوظيف." />
+  <title>روَاج | إنشاء السيرة الذاتية باحترافية</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Reem+Kufi:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen text-gray-800">
-    <div class="max-w-md w-full text-center p-6">
-        <h1 class="text-3xl font-bold text-slate-800 mb-4 tracking-tight">مرحباً بك في أكوادرا</h1>
-        <p class="text-gray-600 mb-8">
-            المنشئ الخارق الذي يساعدك على بناء تطبيقات جميلة باستخدام Tailwind CSS.
-        </p>
-        
-        <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-100 hover:scale-105 transition-all duration-300 cursor-pointer card group">
-            <div class="w-12 h-12 bg-indigo-50 rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:bg-indigo-100 transition-colors">
-                 <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
-            </div>
-            <h2 class="text-xl font-semibold text-gray-900 mb-2">جاهز للبناء</h2>
-            <p class="text-gray-500 text-sm">اطلب من الذكاء الاصطناعي تغيير هذا التصميم أو بناء شيء جديد كلياً.</p>
-        </div>
-        
-        <div class="mt-8 text-sm text-gray-400">
-            مدعوم بواسطة Gemini 3 Pro
-        </div>
+<body>
+  <div class="ambient-orb orb-one" aria-hidden="true"></div>
+  <div class="ambient-orb orb-two" aria-hidden="true"></div>
+  <div class="noise-layer" aria-hidden="true"></div>
+
+  <header class="site-header" id="siteHeader">
+    <nav class="nav-shell" aria-label="التنقل الرئيسي">
+      <a href="/" class="brand nav-link" data-link aria-label="روَاج الرئيسية">
+        <span class="brand-mark">ر</span>
+        <span>
+          <strong>روَاج</strong>
+          <small>سير ذاتية تتحرك نحو الفرصة</small>
+        </span>
+      </a>
+      <button class="menu-toggle" id="menuToggle" type="button" aria-label="فتح القائمة" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-links" id="navLinks">
+        <a href="/" data-link>الرئيسية</a>
+        <a href="/templates" data-link>القوالب</a>
+        <a href="/builder" data-link>منشئ السيرة</a>
+        <a href="/dashboard" data-link>لوحة السير</a>
+        <a href="/pricing" data-link>الأسعار</a>
+        <a href="/about" data-link>عن روَاج</a>
+        <a href="/contact" data-link>تواصل</a>
+      </div>
+      <a class="nav-cta" href="/builder" data-link>ابدأ سيرتك الآن</a>
+    </nav>
+  </header>
+
+  <main id="app" class="app-shell" tabindex="-1"></main>
+
+  <footer class="footer-shell">
+    <div class="footer-grid">
+      <div>
+        <a href="/" data-link class="brand footer-brand">
+          <span class="brand-mark">ر</span>
+          <span><strong>روَاج</strong><small>منصة بناء السيرة الذكية</small></span>
+        </a>
+        <p>نحوّل خبرتك إلى قصة مهنية واضحة، جذابة، وقابلة للتعديل والحفظ في أي وقت.</p>
+      </div>
+      <div>
+        <h3>صفحات المنصة</h3>
+        <a href="/templates" data-link>مكتبة القوالب</a>
+        <a href="/builder" data-link>إنشاء سيرة جديدة</a>
+        <a href="/dashboard" data-link>السير المحفوظة</a>
+      </div>
+      <div>
+        <h3>للترقية المهنية</h3>
+        <a href="/pricing" data-link>خطط روَاج</a>
+        <a href="/about" data-link>منهجية الكتابة</a>
+        <a href="/contact" data-link>استشارة محتوى</a>
+      </div>
+      <div class="footer-card">
+        <span>جاهز لمقابلة أفضل؟</span>
+        <strong>ابنِ نسخة مؤثرة خلال دقائق</strong>
+        <a href="/builder" data-link>ابدأ مجاناً</a>
+      </div>
     </div>
-    <script src="script.js"></script>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="script.js"></script>
 </body>
 </html>
