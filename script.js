@@ -1,7 +1,18 @@
 console.log('Akwadra Super Builder Initialized');
 console.log('منصة روَاج لإنشاء السير الذاتية جاهزة');
 
+const uploadedTemplateAssets = {
+  modernBlueSystemsAnalyst: 'assets/cv-templates/modern-blue-systems-analyst.png',
+  professionalBlueGraphicDesigner: 'assets/cv-templates/professional-blue-graphic-designer.png',
+  brownBlueGraphicDesigner: 'assets/cv-templates/brown-blue-graphic-designer.png',
+  brownBeigeGraphicDesigner: 'assets/cv-templates/brown-beige-graphic-designer.png'
+};
+
 const templates = [
+  { id: 'uploaded-blue-systems-analyst', name: 'أزرق محلل نظم', category: 'تحليل نظم', tone: 'حديث', popularity: 100, accent: '#294b7d', accent2: '#5ca2df', pages: 'صفحة واحدة', desc: 'قالب عربي أزرق بمسار زمني واضح وصورة شخصية بارزة لمحللي النظم والوظائف التقنية.', tags: ['ملف مرفوع', 'تحليل نظم', 'أزرق'], image: uploadedTemplateAssets.modernBlueSystemsAnalyst },
+  { id: 'uploaded-blue-graphic-designer', name: 'أزرق مصمم جرافيك', category: 'تصميم', tone: 'احترافي', popularity: 99, accent: '#123d58', accent2: '#f8fafc', pages: 'صفحة واحدة', desc: 'تصميم أزرق احترافي بمساحة جانبية منظمة للمهارات والتواصل، مناسب للمصممين والمبدعين.', tags: ['ملف مرفوع', 'تصميم', 'أزرق'], image: uploadedTemplateAssets.professionalBlueGraphicDesigner },
+  { id: 'uploaded-brown-blue-designer', name: 'Brown Blue Graphic Designer', category: 'تصميم', tone: 'إبداعي', popularity: 98, accent: '#4a3740', accent2: '#9b9084', pages: 'صفحة واحدة', desc: 'قالب إنجليزي أنيق بدرجات بني وأزرق وتوازن واضح بين الشريط الجانبي والخبرة المهنية.', tags: ['Uploaded', 'Graphic Design', 'Sidebar'], image: uploadedTemplateAssets.brownBlueGraphicDesigner },
+  { id: 'uploaded-brown-beige-designer', name: 'بني وبيج مصمم جرافيك', category: 'تصميم', tone: 'راقي', popularity: 97, accent: '#5a403e', accent2: '#ded6c9', pages: 'صفحة واحدة', desc: 'قالب عربي بني وبيج بتكوين هندسي حديث، مناسب لعرض الخبرات الإبداعية بصورة هادئة وفاخرة.', tags: ['ملف مرفوع', 'بيج', 'مصمم جرافيك'], image: uploadedTemplateAssets.brownBeigeGraphicDesigner },
   { id: 'executive-atlas', name: 'أطلس التنفيذي', category: 'إداري', tone: 'رسمي', popularity: 98, accent: '#0d5d56', pages: 'صفحتان', desc: 'قالب قيادي بكتل إنجازات واضحة مناسب للمدراء والاستشاريين.', tags: ['قيادة', 'إنجازات', 'ATS'] },
   { id: 'creative-pulse', name: 'نبض الإبداع', category: 'إبداعي', tone: 'جريء', popularity: 94, accent: '#b95748', pages: 'صفحة واحدة', desc: 'تكوين بصري لافت للمصممين والمسوقين وصناع المحتوى.', tags: ['إبداع', 'ألوان', 'Portfolio'] },
   { id: 'tech-orbit', name: 'مدار التقنية', category: 'تقني', tone: 'حديث', popularity: 96, accent: '#1f6feb', pages: 'صفحتان', desc: 'يركز على المشاريع، المهارات التقنية، وروابط GitHub وLinkedIn.', tags: ['تقنية', 'مشاريع', 'مهارات'] },
@@ -418,20 +429,25 @@ function stepCard(num, title, text) {
 
 function templateCard(t) {
   const avatar = t.avatar || createTemplateAvatar(t);
+  const cardAvatar = t.image || avatar;
   const shape = t.shape || 'folio';
   const layout = t.layout || 'stacked';
   const favorite = isTemplateFavorite(t.id);
   const isCanvasTemplate = Boolean(t.canvasStyle);
-  return `<article class="template-card reveal ${isCanvasTemplate ? 'canva-template-card' : ''}">
-    <div class="template-preview ${isCanvasTemplate ? 'canva-template-preview' : ''}" style="--accent:${t.accent}; --accent-2:${t.accent2 || t.accent}">
-      <div class="template-mini shape-${shape} layout-${layout} ${isCanvasTemplate ? `canvas-style canvas-${t.canvasStyle}` : ''}" style="--accent:${t.accent}; --accent-2:${t.accent2 || t.accent}">
+  const hasRealTemplateImage = Boolean(t.image);
+  const previewVisual = hasRealTemplateImage
+    ? `<img class="template-real-image" src="${t.image}" alt="معاينة كاملة لقالب ${escapeAttr(t.name)}" loading="lazy">`
+    : `<div class="template-mini shape-${shape} layout-${layout} ${isCanvasTemplate ? `canvas-style canvas-${t.canvasStyle}` : ''}" style="--accent:${t.accent}; --accent-2:${t.accent2 || t.accent}">
         <div class="top"><img class="template-avatar" src="${avatar}" alt="صورة رمزية لقالب ${escapeAttr(t.name)}"></div>
         ${isCanvasTemplate ? '<span class="canvas-dot dot-one"></span><span class="canvas-dot dot-two"></span><span class="canvas-ribbon"></span><div class="canvas-photo"></div>' : ''}
         <div class="row"></div><div class="row"></div><div class="row"></div><div class="row"></div>
-      </div>
+      </div>`;
+  return `<article class="template-card reveal ${isCanvasTemplate ? 'canva-template-card' : ''} ${hasRealTemplateImage ? 'template-card-real' : ''}">
+    <div class="template-preview ${isCanvasTemplate ? 'canva-template-preview' : ''} ${hasRealTemplateImage ? 'template-preview-real' : ''}" style="--accent:${t.accent}; --accent-2:${t.accent2 || t.accent}">
+      ${previewVisual}
     </div>
     <div class="template-body">
-      <div class="template-title-row"><img class="template-card-avatar" src="${avatar}" alt=""><div><h3>${t.name}</h3><small>${t.category} · ${t.tone}</small></div></div>
+      <div class="template-title-row"><img class="template-card-avatar" src="${cardAvatar}" alt=""><div><h3>${t.name}</h3><small>${t.category} · ${t.tone}</small></div></div>
       <p>${t.desc}</p>
       <div class="tags">${t.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>
       <div class="action-row">
