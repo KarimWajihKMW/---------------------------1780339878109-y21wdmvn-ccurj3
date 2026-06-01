@@ -219,7 +219,8 @@ const state = {
   dashboardPage: 1,
   dashboardSearch: '',
   dashboardSort: 'updated',
-  paymentMethod: 'apple-pay'
+  paymentMethod: 'apple-pay',
+  settingsTab: 'profile'
 };
 
 const themePalettes = [
@@ -411,11 +412,17 @@ function accountSettingsPage() {
   const user = getCurrentUser();
   if (!user) return loginRequiredPage();
   const settings = getAccountSettings();
+  const settingsTab = state.settingsTab || 'profile';
   return pageShell(`
     <div class="section-head reveal">
       <div><span class="eyebrow">إعدادات الحساب</span><h2>تحكم ببياناتك وتفضيلات تجربة روَاج.</h2></div>
-      <p>صفحة إعدادات محلية لإدارة الملف الشخصي، تفضيلات القوالب، التنبيهات، وخيارات أمان الحساب على هذا المتصفح.</p>
+      <p>صفحة إعدادات محلية لإدارة الملف الشخصي، تفضيلات القوالب، التنبيهات، الاشتراك، وخيارات أمان الحساب على هذا المتصفح.</p>
     </div>
+    <div class="settings-tabs reveal" role="tablist" aria-label="تبويبات إعدادات الحساب">
+      <button type="button" role="tab" aria-selected="${settingsTab === 'profile'}" class="settings-tab ${settingsTab === 'profile' ? 'active' : ''}" data-action="settings-tab" data-tab="profile">الملف والتفضيلات</button>
+      <button type="button" role="tab" aria-selected="${settingsTab === 'subscription'}" class="settings-tab ${settingsTab === 'subscription' ? 'active' : ''}" data-action="settings-tab" data-tab="subscription">إدارة الاشتراك</button>
+    </div>
+    ${settingsTab === 'profile' ? `
     <div class="settings-layout">
       <article class="form-card reveal">
         <form class="account-settings-form" id="accountSettingsForm">
@@ -463,7 +470,50 @@ function accountSettingsPage() {
         </article>
       </aside>
     </div>
+    ` : subscriptionManagementPanel(user)}
   `);
+}
+
+function subscriptionManagementPanel(user) {
+  const receipt = getLastPaymentReceipt();
+  const planName = isPaymentActive() ? 'المحترف' : 'التجربة الأولى';
+  const renewalDate = receipt ? formatDate(receipt.createdAt + 30 * 24 * 60 * 60 * 1000) : 'غير محدد';
+  return `
+    <div class="settings-subscription reveal">
+      <article class="panel subscription-hero">
+        <div>
+          <span class="eyebrow">إدارة الاشتراك</span>
+          <h3>خطة ${planName}</h3>
+          <p class="lead">تابع حالة اشتراكك، طريقة الدفع، الإيصال الأخير، وخيارات الترقية أو إدارة الفوترة من مكان واحد داخل الإعدادات.</p>
+        </div>
+        <div class="subscription-status ${isPaymentActive() ? 'active' : ''}">
+          <span>${isPaymentActive() ? 'نشط' : 'مجاني'}</span>
+          <strong>${isPaymentActive() ? 'السير الإضافية مفعّلة' : 'سيرة أولى مجانية'}</strong>
+        </div>
+      </article>
+      <div class="settings-subscription-grid">
+        <article class="panel">
+          <h3>تفاصيل الخطة</h3>
+          <div class="billing-summary">
+            <span>الخطة الحالية</span><strong>${planName}</strong>
+            <span>حالة الدفع</span><strong>${isPaymentActive() ? 'مدفوع' : 'غير مفعّل بعد'}</strong>
+            <span>التجديد / المرجع</span><strong>${receipt ? renewalDate : 'لا يوجد إيصال'}</strong>
+            <span>البريد المرتبط</span><strong>${escapeHtml(user.email || 'غير محدد')}</strong>
+          </div>
+          <div class="action-row">
+            ${isPaymentActive() ? '<a class="secondary-btn" href="/receipt" data-link>عرض الإيصال الأخير</a><a class="ghost-btn" href="/pricing" data-link>تغيير الخطة</a>' : '<a class="primary-btn" href="/checkout" data-link>ترقية الاشتراك</a><a class="secondary-btn" href="/pricing" data-link>مقارنة الخطط</a>'}
+          </div>
+        </article>
+        <article class="panel">
+          <h3>طريقة الدفع والفوترة</h3>
+          <p class="settings-note">يمكنك إكمال الدفع عبر Apple Pay أو البطاقة البنكية. بعد الدفع سيظهر الإيصال تلقائياً ويمكن إرساله بالبريد.</p>
+          <div class="payment-methods compact">
+            ${paymentMethods.map(method => `<div class="payment-method static"><span>${method.icon}</span><strong>${method.name}</strong><small>${method.desc}</small></div>`).join('')}
+          </div>
+        </article>
+      </div>
+    </div>
+  `;
 }
 
 function routeLink(html) {
@@ -1141,6 +1191,7 @@ function handleAction(event) {
   const action = event.currentTarget.dataset.action;
   const page = Number(event.currentTarget.dataset.page);
   const id = event.currentTarget.dataset.id;
+  if (action === 'settings-tab') { state.settingsTab = event.currentTarget.dataset.tab || 'profile'; render(); return; }
   if (action === 'auth-social') { completeSocialRegistration(event.currentTarget.dataset.provider); return; }
   if (action === 'auth-logout') { logoutCurrentUser(); return; }
   if (action === 'reset-account-settings') { resetAccountSettings(); return; }
