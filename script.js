@@ -1062,6 +1062,39 @@ function aboutPage() {
   `);
 }
 
+function privacyPolicyPage() {
+  return pageShell(`
+    <div class="section-head reveal">
+      <div><span class="eyebrow">سياسة الخصوصية</span><h2>نحافظ على وضوح استخدام بياناتك داخل روَاج.</h2></div>
+      <p>توضح هذه الصفحة نوع البيانات التي تستخدمها المنصة، وكيف يتم حفظها محلياً، والخيارات المتاحة لك لإدارة حسابك وسيرك الذاتية.</p>
+    </div>
+    <div class="grid-2">
+      <article class="panel reveal">
+        <h3>البيانات التي تدخلها</h3>
+        <p class="lead">قد تتضمن البيانات الاسم، البريد الإلكتروني، رقم الهاتف، المدينة، تفاصيل الخبرات، التعليم، المهارات، وتفضيلات القوالب التي تختارها أثناء استخدام منشئ السيرة.</p>
+      </article>
+      <article class="panel reveal">
+        <h3>طريقة التخزين</h3>
+        <p class="lead">تعمل هذه النسخة كتجربة موقع ثابت، لذلك تُحفظ بيانات الحساب والسير والإعدادات محلياً في متصفحك عبر localStorage ولا يتم إرسالها إلى خادم خارجي من خلال هذه الواجهة.</p>
+      </article>
+      <article class="panel reveal">
+        <h3>استخدام البيانات</h3>
+        <p class="lead">نستخدم البيانات التي تدخلها لتوليد معاينة السيرة، حفظ القالب المختار، إدارة لوحة السير، تجهيز الإيصال المحلي، وتحسين تجربة التنقل داخل صفحات روَاج.</p>
+      </article>
+      <article class="panel reveal">
+        <h3>خيارات التحكم</h3>
+        <p class="lead">يمكنك حذف بيانات الحساب المحلية من صفحة الإعدادات، تسجيل الخروج، أو مسح بيانات المتصفح لإزالة المعلومات المخزنة على جهازك.</p>
+      </article>
+    </div>
+    <article class="panel reveal" style="margin-top:26px">
+      <span class="eyebrow">التواصل والطلبات</span>
+      <h3>هل لديك سؤال حول الخصوصية؟</h3>
+      <p class="lead">إذا احتجت توضيحاً إضافياً حول البيانات أو رغبت بطلب مساعدة لإدارة معلوماتك، يمكنك التواصل مع فريق روَاج من صفحة التواصل.</p>
+      <div class="hero-actions"><a class="primary-btn" href="/contact" data-link>تواصل معنا</a><a class="secondary-btn" href="/settings" data-link>إعدادات الحساب</a></div>
+    </article>
+  `);
+}
+
 function deployPage() {
   return pageShell(`
     <div class="section-head reveal">
@@ -1246,6 +1279,7 @@ function render() {
   else if (path === '/receipt') app.innerHTML = paymentReceiptPage();
   else if (path === '/auth') app.innerHTML = authPage();
   else if (path === '/about') app.innerHTML = aboutPage();
+  else if (path === '/privacy') app.innerHTML = privacyPolicyPage();
   else if (path === '/deploy') app.innerHTML = deployPage();
   else if (path === '/domain-guide') app.innerHTML = domainGuidePage();
   else if (path === '/contact') app.innerHTML = contactPage();
