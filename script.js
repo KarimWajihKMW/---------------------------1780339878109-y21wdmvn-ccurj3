@@ -1062,6 +1062,30 @@ function aboutPage() {
   `);
 }
 
+function deployPage() {
+  return pageShell(`
+    <div class="section-head reveal">
+      <div><span class="eyebrow">نشر الموقع</span><h2>جهّز موقع روَاج للظهور على الإنترنت بخطوات واضحة.</h2></div>
+      <p>تبويب مخصص لإرشادات نشر الموقع الثابت، ربط النطاق، ومتابعة جاهزية الصفحات الأساسية قبل الإطلاق.</p>
+    </div>
+    <div class="grid-3">
+      ${featureCard('1','اختيار منصة النشر','ارفع ملفات الموقع إلى منصة استضافة ثابتة مثل GitHub Pages أو Netlify أو Vercel مع ضبط مجلد الجذر على ملفات المشروع الحالية.')}
+      ${featureCard('2','ربط النطاق','أضف النطاق المخصص من إعدادات المنصة، ثم حدّث سجلات DNS المطلوبة لدى مزود النطاق لتوجيه الزوار إلى الموقع.')}
+      ${featureCard('3','تأكيد الإطلاق','حدّث روابط التواصل والصفحات المهمة، ثم شارك رابط الموقع النهائي مع العملاء أو الباحثين عن عمل.')}
+    </div>
+    <article class="panel reveal" style="margin-top:26px">
+      <span class="eyebrow">قائمة جاهزية سريعة</span>
+      <div class="values-grid">
+        <div class="value-card"><strong>ملف البداية</strong><p>index.html هو نقطة الدخول الأساسية للموقع.</p></div>
+        <div class="value-card"><strong>التصميم</strong><p>style.css يحتوي على تنسيقات الواجهة والتجاوب.</p></div>
+        <div class="value-card"><strong>التفاعل</strong><p>script.js يدير الصفحات والتنقل الداخلي.</p></div>
+        <div class="value-card"><strong>الرابط النهائي</strong><p>احفظ رابط النشر لاستخدامه في الحملات والملفات التعريفية.</p></div>
+      </div>
+      <div class="hero-actions"><a class="primary-btn" href="/" data-link>العودة للرئيسية</a><a class="secondary-btn" href="/contact" data-link>طلب مساعدة بالنشر</a></div>
+    </article>
+  `);
+}
+
 function contactPage() {
   return pageShell(`
     <div class="contact-layout">
@@ -1116,6 +1140,7 @@ function render() {
   else if (path === '/receipt') app.innerHTML = paymentReceiptPage();
   else if (path === '/auth') app.innerHTML = authPage();
   else if (path === '/about') app.innerHTML = aboutPage();
+  else if (path === '/deploy') app.innerHTML = deployPage();
   else if (path === '/contact') app.innerHTML = contactPage();
   else app.innerHTML = notFoundPage();
 
