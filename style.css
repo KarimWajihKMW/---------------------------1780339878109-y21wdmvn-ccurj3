@@ -376,6 +376,40 @@ h3 { font-size: 1.35rem; margin: 0 0 10px; }
   display: grid;
   align-items: center;
 }
+.template-card-real { border-color: color-mix(in srgb, var(--accent, var(--teal)) 34%, var(--line)); }
+.template-preview-real {
+  position: relative;
+  overflow: hidden;
+  min-height: 310px;
+  padding: 16px;
+  background:
+    radial-gradient(circle at 20% 12%, rgba(255,255,255,.62), transparent 28%),
+    linear-gradient(145deg, color-mix(in srgb, var(--accent, var(--teal)) 22%, #fffaf0), color-mix(in srgb, var(--accent-2, var(--amber)) 20%, #fffaf0));
+}
+.template-preview-real::before {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  border-radius: 26px;
+  border: 1px solid rgba(255,255,255,.56);
+  pointer-events: none;
+}
+.template-real-image {
+  position: relative;
+  z-index: 1;
+  width: min(188px, 62%);
+  height: 278px;
+  margin: auto;
+  display: block;
+  object-fit: cover;
+  object-position: top center;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,.78);
+  box-shadow: 0 22px 56px rgba(23,18,11,.24);
+  transform: rotate(-2deg);
+  transition: transform .3s ease, box-shadow .3s ease;
+}
+.template-card-real:hover .template-real-image { transform: rotate(0deg) scale(1.045); box-shadow: 0 28px 68px rgba(23,18,11,.28); }
 .template-mini {
   width: 72%;
   min-height: 195px;
@@ -737,4 +771,6 @@ td { color: #4e4131; }
   .theme-toggle { min-width: 46px; padding-inline: 11px; }
   .footer-grid { grid-template-columns: 1fr; border-radius: 26px; }
   .template-preview { height: 220px; }
+  .template-preview-real { min-height: 280px; }
+  .template-real-image { height: 248px; width: min(170px, 68%); }
 }
