@@ -1135,6 +1135,28 @@ function domainGuidePage() {
 
     <section class="reveal" style="margin-top:70px">
       <div class="section-head">
+        <div><span class="eyebrow">جدول مقارنة</span><h2>قارن بين سجلات DNS قبل إضافتها.</h2></div>
+        <p>يساعدك الجدول على اختيار نوع السجل المناسب وفهم مكان استخدامه، القيمة المتوقعة، والأخطاء الشائعة التي قد تؤخر ربط النطاق.</p>
+      </div>
+      <article class="table-card reveal">
+        <div class="table-wrap">
+          <table aria-label="جدول مقارنة بين سجلات DNS">
+            <thead>
+              <tr><th>نوع السجل</th><th>الاستخدام الأساسي</th><th>القيمة المتوقعة</th><th>مثال عملي</th><th>ملاحظات مهمة</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>A</strong></td><td>توجيه النطاق الأساسي إلى خادم أو منصة نشر.</td><td>عنوان IP مثل 185.199.108.153</td><td>example.com → عنوان IP للمنصة</td><td>لا يستخدم مع أسماء نطاقات، واحذف أي سجل A قديم متعارض.</td></tr>
+              <tr><td><strong>CNAME</strong></td><td>ربط نطاق فرعي بعنوان تمنحه منصة النشر.</td><td>اسم مضيف مثل project.netlify.app</td><td>www.example.com → cname.vercel-dns.com</td><td>لا تضع https:// داخل القيمة، ولا تستخدمه عادة للنطاق الأساسي.</td></tr>
+              <tr><td><strong>TXT</strong></td><td>إثبات الملكية أو إضافة معلومات تحقق وخدمات بريد.</td><td>نص تحقق طويل أو قيمة SPF/DKIM</td><td>_verify.example.com → token-123</td><td>انسخ النص كاملاً كما يظهر، بما في ذلك الرموز والفواصل.</td></tr>
+              <tr><td><strong>MX</strong></td><td>توجيه بريد النطاق إلى مزود البريد الإلكتروني.</td><td>خادم بريد مع أولوية رقمية</td><td>example.com → mail.provider.com أولوية 10</td><td>لا يؤثر على فتح الموقع، لكنه ضروري لاستقبال البريد على النطاق.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <section class="reveal" style="margin-top:70px">
+      <div class="section-head">
         <div><span class="eyebrow">تفادي الأخطاء</span><h2>مشكلات DNS الأكثر تكراراً وحلولها.</h2></div>
       </div>
       <div class="grid-2">
