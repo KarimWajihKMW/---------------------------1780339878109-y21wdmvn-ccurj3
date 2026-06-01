@@ -140,9 +140,30 @@ templateExpansionGroups.forEach((group, groupIndex) => {
   });
 });
 
+const canvaDesignStyles = ['gold', 'wave', 'rose', 'beige', 'neon', 'grid', 'organic', 'mono', 'duotone', 'sunset', 'mint', 'royal'];
+const canvaLayouts = ['poster', 'split', 'grid', 'stacked'];
+const canvaColorPairs = [
+  ['#b8860b', '#111827'],
+  ['#0891b2', '#0f766e'],
+  ['#e11d48', '#f97316'],
+  ['#9a6b3f', '#d6b48a'],
+  ['#7c3aed', '#06b6d4'],
+  ['#2563eb', '#f59e0b'],
+  ['#65a30d', '#f4b23c'],
+  ['#111827', '#6b7280'],
+  ['#db2777', '#8b5cf6'],
+  ['#ea580c', '#facc15'],
+  ['#0f766e', '#99f6e4'],
+  ['#4338ca', '#c084fc']
+];
+
 templates.forEach((template, index) => {
-  template.shape = template.shape || templateShapeStyles[index % templateShapeStyles.length].key;
-  template.layout = template.layout || (index % 2 === 0 ? 'stacked' : 'split');
+  const [primary, secondary] = canvaColorPairs[index % canvaColorPairs.length];
+  template.shape = 'canvas';
+  template.layout = template.layout || canvaLayouts[index % canvaLayouts.length];
+  template.canvasStyle = template.canvasStyle || canvaDesignStyles[index % canvaDesignStyles.length];
+  template.accent = template.accent || primary;
+  template.accent2 = template.accent2 || secondary;
   template.avatarText = template.avatarText || template.name.replace(/^(ال|أ|إ|آ)/, '').slice(0, 2);
   template.avatar = template.avatar || createTemplateAvatar(template, index);
 });
