@@ -537,19 +537,19 @@ function pagination(pages, current, action) {
 
 function builderPage(editId = '') {
   const urlParams = new URLSearchParams(location.search);
-  const selectedTemplate = urlParams.get('template') || defaultResume.template;
+  const savedTemplate = localStorage.getItem('rawaj_selected_resume_template');
+  const selectedTemplate = urlParams.get('template') || savedTemplate || defaultResume.template;
   const saved = getSavedResumes();
   const existing = saved.find(r => r.id === editId);
   const data = { ...defaultResume, template: selectedTemplate, ...(existing || {}) };
   return pageShell(`
     <div class="section-head reveal">
-      <div><span class="eyebrow">منشئ السيرة</span><h2>${existing ? 'تعديل سيرة محفوظة' : 'أنشئ سيرة ذاتية قابلة للحفظ والتعديل.'}</h2></div>
-      <p>أول سيرة ذاتية مجانية، وبعدها يتطلب إنشاء سير إضافية دفعاً آمناً عبر Apple Pay أو بطاقة بنكية.</p>
+      <div><span class="eyebrow">منشئ السيرة</span><h2>${existing ? 'تعديل قالب سيرة محفوظة' : 'اختر قالب السيرة الذاتية واحفظ القالب فقط.'}</h2></div>
+      <p>خيار الحفظ هنا يحفظ القالب المختار فقط في المفضلة ولا يحفظ بيانات السيرة أو يستهلك السيرة المجانية.</p>
     </div>
     <div class="billing-alert reveal ${isPaymentActive() ? 'paid' : ''}">
-      <strong>${isPaymentActive() ? 'الدفع مفعّل' : hasUsedFreeResume() ? 'تم استخدام السيرة المجانية' : 'السيرة الأولى مجانية'}</strong>
-      <span>${isPaymentActive() ? 'يمكنك إنشاء سير إضافية الآن.' : hasUsedFreeResume() ? 'سيتم تحويلك للدفع عند حفظ سيرة جديدة.' : 'احفظ أول سيرة بدون دفع، ثم تصبح السير الإضافية مدفوعة.'}</span>
-      ${!isPaymentActive() && hasUsedFreeResume() ? '<a class="mini-btn" href="/checkout" data-link>الدفع الآن</a>' : ''}
+      <strong>حفظ القالب فقط</strong>
+      <span>سيتم حفظ اختيار القالب دون تخزين الاسم أو الخبرات أو أي بيانات شخصية من النموذج.</span>
     </div>
     <div class="builder-layout">
       <article class="form-card reveal">
@@ -569,7 +569,7 @@ function builderPage(editId = '') {
           ${textarea('التعليم والشهادات','education',data.education)}
           ${textarea('المهارات - افصل بينها بفواصل','skills',data.skills)}
           <label>حالة السيرة<select name="status"><option ${data.status==='جاهزة'?'selected':''}>جاهزة</option><option ${data.status==='مسودة'?'selected':''}>مسودة</option></select></label>
-          <div class="action-row"><button class="primary-btn" type="submit">حفظ السيرة</button><button class="secondary-btn" type="button" data-action="download-current-pdf">حفظ PDF</button><button class="secondary-btn" type="button" id="resetForm">مسح الحقول</button></div>
+          <div class="action-row"><button class="primary-btn" type="button" data-action="save-current-template">حفظ قالب السيرة فقط</button><button class="secondary-btn" type="button" data-action="download-current-pdf">تصدير PDF</button><button class="secondary-btn" type="button" id="resetForm">مسح الحقول</button></div>
         </form>
       </article>
       <aside class="resume-preview reveal"><div class="preview-paper" id="resumePreview"></div></aside>
@@ -640,7 +640,7 @@ function dashboardPage() {
               <td>${templates.find(t=>t.id===r.template)?.name || 'قالب روَاج'}</td>
               <td><span class="status-pill ${r.status==='مسودة'?'draft':''}">${r.status}</span></td>
               <td>${formatDate(r.updatedAt)}</td>
-              <td><div class="action-row"><button class="mini-btn" data-action="preview-resume" data-id="${r.id}">معاينة</button><button class="mini-btn" data-action="download-resume-pdf" data-id="${r.id}">PDF</button><button class="mini-btn" data-action="share-resume-link" data-id="${r.id}">مشاركة الرابط</button><button class="mini-btn" data-action="edit-resume" data-id="${r.id}">تعديل</button><button class="mini-btn" data-action="duplicate-resume" data-id="${r.id}">تكرار</button><button class="mini-btn" data-action="delete-resume" data-id="${r.id}">حذف</button></div></td>
+              <td><div class="action-row"><button class="mini-btn" data-action="preview-resume" data-id="${r.id}">معاينة</button><button class="mini-btn" data-action="download-resume-pdf" data-id="${r.id}">تصدير PDF</button><button class="mini-btn" data-action="share-resume-link" data-id="${r.id}">مشاركة الرابط</button><button class="mini-btn" data-action="edit-resume" data-id="${r.id}">تعديل</button><button class="mini-btn" data-action="duplicate-resume" data-id="${r.id}">تكرار</button><button class="mini-btn" data-action="delete-resume" data-id="${r.id}">حذف</button></div></td>
             </tr>`).join('') || `<tr><td colspan="6"><div class="empty-state">لا توجد سير محفوظة مطابقة. أنشئ سيرة جديدة لتظهر هنا.</div></td></tr>`}
           </tbody>
         </table>
@@ -658,7 +658,7 @@ function savedPreviewPage(id) {
   return pageShell(`
     <div class="section-head reveal">
       <div><span class="eyebrow">معاينة السيرة المحفوظة</span><h2>${escapeHtml(resume.name)}</h2></div>
-      <div class="hero-actions"><button class="secondary-btn" type="button" data-action="download-resume-pdf" data-id="${resume.id}">حفظ PDF</button><button class="secondary-btn" type="button" data-action="share-resume-link" data-id="${resume.id}">مشاركة رابط السيرة</button><a class="secondary-btn" href="/builder/${resume.id}" data-link>تعديل السيرة</a><a class="primary-btn" href="/dashboard" data-link>العودة للوحة</a></div>
+      <div class="hero-actions"><button class="secondary-btn" type="button" data-action="download-resume-pdf" data-id="${resume.id}">تصدير PDF</button><button class="secondary-btn" type="button" data-action="share-resume-link" data-id="${resume.id}">مشاركة رابط السيرة</button><a class="secondary-btn" href="/builder/${resume.id}" data-link>تعديل السيرة</a><a class="primary-btn" href="/dashboard" data-link>العودة للوحة</a></div>
     </div>
     <div class="saved-preview-layout">
       <article class="resume-preview-page reveal" style="--accent:${template.accent}">
@@ -890,7 +890,7 @@ function bindPageEvents() {
   const resumeForm = document.getElementById('resumeForm');
   if (resumeForm) {
     resumeForm.addEventListener('input', updatePreview);
-    resumeForm.addEventListener('submit', saveResumeFromForm);
+    resumeForm.addEventListener('submit', saveCurrentResumeTemplate);
     document.getElementById('resetForm')?.addEventListener('click', () => { resumeForm.reset(); updatePreview(); showToast('تم مسح الحقول مؤقتاً'); });
     updatePreview();
   }
@@ -917,6 +917,7 @@ function handleAction(event) {
     render();
     return;
   }
+  if (action === 'save-current-template') { saveCurrentResumeTemplate(event); return; }
   if (action === 'template-page') { state.templatePage = page; render(); return; }
   if (action === 'dashboard-page') { state.dashboardPage = page; render(); return; }
   if (action === 'payment-method') { state.paymentMethod = event.currentTarget.dataset.method; render(); return; }
@@ -1032,6 +1033,19 @@ function updatePreview() {
   const template = templates.find(t => t.id === data.template) || templates[0];
   preview.style.borderTop = `10px solid ${template.accent}`;
   preview.innerHTML = resumeDocumentHtml(data);
+}
+
+function saveCurrentResumeTemplate(event) {
+  event?.preventDefault();
+  const form = document.getElementById('resumeForm');
+  if (!form) return;
+  const data = Object.fromEntries(new FormData(form));
+  const template = templates.find(t => t.id === data.template) || templates[0];
+  const favorites = getFavoriteTemplates();
+  if (!favorites.includes(template.id)) saveFavoriteTemplates([...favorites, template.id]);
+  localStorage.setItem('rawaj_selected_resume_template', template.id);
+  updatePreview();
+  showToast(`تم حفظ قالب "${template.name}" فقط دون حفظ بيانات السيرة`);
 }
 
 function downloadCurrentResumePdf() {
