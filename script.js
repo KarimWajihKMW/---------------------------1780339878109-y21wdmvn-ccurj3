@@ -190,6 +190,11 @@ const paymentMethods = [
   { id: 'card', name: 'بطاقة بنكية', icon: '▣', desc: 'أضف بطاقة مدى، فيزا، أو ماستركارد لإكمال الدفع.' }
 ];
 
+const socialAuthProviders = [
+  { id: 'google', name: 'Google', icon: 'G', desc: 'تابع بحساب Google واحفظ بياناتك بسرعة.' },
+  { id: 'apple', name: 'Apple', icon: '', desc: 'تابع بحساب Apple مع تجربة تسجيل مختصرة.' }
+];
+
 const defaultResume = {
   id: '',
   name: 'كريم واجيه',
@@ -230,8 +235,36 @@ const navLinks = document.getElementById('navLinks');
 const menuToggle = document.getElementById('menuToggle');
 const themeToggle = document.getElementById('themeToggle');
 const themeToggleLabel = document.getElementById('themeToggleLabel');
+const authNavLink = document.getElementById('authNavLink');
 
 applyTheme(getSavedTheme(), false);
+
+function getCurrentUser() {
+  const saved = localStorage.getItem('rawaj_current_user');
+  return saved ? JSON.parse(saved) : null;
+}
+
+function saveCurrentUser(user) {
+  const users = JSON.parse(localStorage.getItem('rawaj_users') || '[]');
+  const existingIndex = users.findIndex(item => item.email === user.email && item.provider === user.provider);
+  if (existingIndex >= 0) users[existingIndex] = { ...users[existingIndex], ...user, updatedAt: Date.now() };
+  else users.unshift({ ...user, createdAt: Date.now(), updatedAt: Date.now() });
+  localStorage.setItem('rawaj_users', JSON.stringify(users));
+  localStorage.setItem('rawaj_current_user', JSON.stringify({ ...user, updatedAt: Date.now() }));
+}
+
+function logoutCurrentUser() {
+  localStorage.removeItem('rawaj_current_user');
+  showToast('تم تسجيل الخروج من حساب روَاج');
+  render();
+}
+
+function updateAuthNavState() {
+  const user = getCurrentUser();
+  if (!authNavLink) return;
+  authNavLink.textContent = user ? 'حسابي' : 'تسجيل';
+  authNavLink.setAttribute('aria-label', user ? `حساب ${user.name || user.email}` : 'تسجيل مستخدم جديد');
+}
 
 function getSavedResumes() {
   const saved = localStorage.getItem('rawaj_resumes');
@@ -365,6 +398,62 @@ function heroDepth() {
         </article>
       </div>
     </div>`;
+}
+
+function authPage() {
+  const user = getCurrentUser();
+  if (user) {
+    return pageShell(`
+      <div class="auth-layout">
+        <article class="auth-card reveal">
+          <span class="eyebrow">حساب روَاج</span>
+          <h2>مرحباً ${escapeHtml(user.name || 'بك')}.</h2>
+          <p class="lead">أنت مسجل حالياً عبر ${escapeHtml(user.providerLabel)} ويمكنك متابعة إنشاء السير المحفوظة وإدارة القوالب من لوحة روَاج.</p>
+          <div class="account-summary">
+            <div><span>الاسم</span><strong>${escapeHtml(user.name || 'مستخدم روَاج')}</strong></div>
+            <div><span>البريد الإلكتروني</span><strong>${escapeHtml(user.email || 'غير محدد')}</strong></div>
+            <div><span>طريقة التسجيل</span><strong>${escapeHtml(user.providerLabel)}</strong></div>
+          </div>
+          <div class="hero-actions"><a class="primary-btn" href="/dashboard" data-link>الانتقال للوحة السير</a><button class="secondary-btn" type="button" data-action="auth-logout">تسجيل الخروج</button></div>
+        </article>
+        <aside class="auth-benefits reveal">
+          ${featureCard('✓','حفظ بيانات الحساب','احتفظ باسمك وبريدك لاستخدامهما في السير والإيصالات لاحقاً.')}
+          ${featureCard('◈','تسجيل اجتماعي سريع','اختر Google أو Apple لتجربة دخول مختصرة على هذا الموقع الثابت.')}
+        </aside>
+      </div>
+    `);
+  }
+
+  return pageShell(`
+    <div class="auth-layout">
+      <article class="form-card auth-card reveal">
+        <span class="eyebrow">تسجيل مستخدم جديد</span>
+        <h2>أنشئ حسابك بالبريد أو تابع عبر Google وApple.</h2>
+        <p class="lead">نموذج تسجيل محلي يحفظ بيانات الحساب على هذا المتصفح، مع أزرار متابعة اجتماعية جاهزة للربط بمزود OAuth عند توفر الخادم.</p>
+        <div class="social-auth-grid">
+          ${socialAuthProviders.map(provider => `<button class="social-auth-btn" type="button" data-action="auth-social" data-provider="${provider.id}"><span>${provider.icon}</span><strong>التسجيل عبر ${provider.name}</strong><small>${provider.desc}</small></button>`).join('')}
+        </div>
+        <div class="auth-divider"><span>أو بالبريد الإلكتروني</span></div>
+        <form class="auth-form" id="authForm">
+          <div class="form-grid">
+            <label>الاسم الكامل<input required name="name" placeholder="اسمك الكامل" autocomplete="name"></label>
+            <label>البريد الإلكتروني<input required type="email" name="email" placeholder="you@example.com" autocomplete="email"></label>
+          </div>
+          <label>كلمة المرور<input required type="password" name="password" minlength="6" placeholder="6 أحرف على الأقل" autocomplete="new-password"></label>
+          <label class="check-line"><input required type="checkbox" name="terms"> <span>أوافق على حفظ بيانات الحساب محلياً لاستخدام تجربة روَاج.</span></label>
+          <button class="primary-btn" type="submit">إنشاء حساب بالبريد</button>
+        </form>
+      </article>
+      <aside class="panel auth-side reveal">
+        <h3>ماذا ستحصل عليه؟</h3>
+        <div class="roadmap">
+          <div class="step-card"><div class="step-num">1</div><div><h3>حساب شخصي</h3><p>اسم وبريد وطريقة تسجيل محفوظة في المتصفح.</p></div></div>
+          <div class="step-card"><div class="step-num">2</div><div><h3>وصول سريع</h3><p>أزرار Google وApple تحاكي التسجيل الاجتماعي لحين ربط مزود فعلي.</p></div></div>
+          <div class="step-card"><div class="step-num">3</div><div><h3>لوحة السير</h3><p>انتقال مباشر للوحة إدارة السير بعد إنشاء الحساب.</p></div></div>
+        </div>
+      </aside>
+    </div>
+  `);
 }
 
 function homePage() {
@@ -840,11 +929,13 @@ function render() {
   else if (path === '/pricing') app.innerHTML = pricingPage();
   else if (path === '/checkout') app.innerHTML = checkoutPage();
   else if (path === '/receipt') app.innerHTML = paymentReceiptPage();
+  else if (path === '/auth') app.innerHTML = authPage();
   else if (path === '/about') app.innerHTML = aboutPage();
   else if (path === '/contact') app.innerHTML = contactPage();
   else app.innerHTML = notFoundPage();
 
   setActiveNav();
+  updateAuthNavState();
   bindPageEvents();
   revealVisible();
   printPendingResumePdf();
@@ -900,12 +991,17 @@ function bindPageEvents() {
 
   const paymentForm = document.getElementById('paymentForm');
   if (paymentForm) paymentForm.addEventListener('submit', e => { e.preventDefault(); completeCheckout('card'); });
+
+  const authForm = document.getElementById('authForm');
+  if (authForm) authForm.addEventListener('submit', handleEmailRegistration);
 }
 
 function handleAction(event) {
   const action = event.currentTarget.dataset.action;
   const page = Number(event.currentTarget.dataset.page);
   const id = event.currentTarget.dataset.id;
+  if (action === 'auth-social') { completeSocialRegistration(event.currentTarget.dataset.provider); return; }
+  if (action === 'auth-logout') { logoutCurrentUser(); return; }
   if (action === 'ai-write-summary') { suggestResumeContent('summary'); return; }
   if (action === 'ai-write-experience') { suggestResumeContent('experience'); return; }
   if (action === 'ai-write-skills') { suggestResumeContent('skills'); return; }
@@ -954,6 +1050,36 @@ function handleAction(event) {
     showToast('تم حذف السيرة');
     render();
   }
+}
+
+function handleEmailRegistration(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const data = Object.fromEntries(new FormData(form));
+  const email = (data.email || '').trim().toLowerCase();
+  const name = (data.name || '').trim();
+  const password = data.password || '';
+  if (!email || !name || password.length < 6) {
+    showToast('أكمل الاسم والبريد وكلمة مرور من 6 أحرف على الأقل');
+    return;
+  }
+  saveCurrentUser({ id: `user-${Date.now()}`, name, email, provider: 'email', providerLabel: 'البريد الإلكتروني' });
+  showToast('تم إنشاء حسابك بالبريد الإلكتروني');
+  navigate('/dashboard');
+}
+
+function completeSocialRegistration(providerId) {
+  const provider = socialAuthProviders.find(item => item.id === providerId) || socialAuthProviders[0];
+  const storedEmail = localStorage.getItem('rawaj_receipt_email') || defaultResume.email;
+  saveCurrentUser({
+    id: `${provider.id}-${Date.now()}`,
+    name: provider.id === 'apple' ? 'مستخدم Apple' : 'مستخدم Google',
+    email: provider.id === 'apple' ? `apple.user.${Date.now()}@privaterelay.appleid.com` : storedEmail,
+    provider: provider.id,
+    providerLabel: provider.name
+  });
+  showToast(`تم التسجيل عبر ${provider.name}`);
+  navigate('/dashboard');
 }
 
 function suggestResumeContent(type) {
