@@ -1081,7 +1081,91 @@ function deployPage() {
         <div class="value-card"><strong>التفاعل</strong><p>script.js يدير الصفحات والتنقل الداخلي.</p></div>
         <div class="value-card"><strong>الرابط النهائي</strong><p>احفظ رابط النشر لاستخدامه في الحملات والملفات التعريفية.</p></div>
       </div>
-      <div class="hero-actions"><a class="primary-btn" href="/" data-link>العودة للرئيسية</a><a class="secondary-btn" href="/contact" data-link>طلب مساعدة بالنشر</a></div>
+      <div class="hero-actions"><a class="primary-btn" href="/domain-guide" data-link>إرشادات ربط النطاق</a><a class="secondary-btn" href="/contact" data-link>طلب مساعدة بالنشر</a></div>
+    </article>
+  `);
+}
+
+function domainGuidePage() {
+  return pageShell(`
+    <section class="hero">
+      <div class="reveal">
+        <span class="eyebrow">إرشادات ربط النطاق</span>
+        <h1>اربط نطاقك بموقع روَاج بثقة.</h1>
+        <p class="lead">اتبع هذه الصفحة كدليل عملي لإضافة نطاق مخصص، ضبط سجلات DNS، تفعيل شهادة الأمان، وتجنب أكثر أخطاء الربط شيوعاً عند نشر الموقع.</p>
+        <div class="hero-actions">
+          <a class="primary-btn" href="#domain-steps">ابدأ الخطوات</a>
+          <a class="secondary-btn" href="/deploy" data-link>العودة لإرشادات النشر</a>
+        </div>
+      </div>
+      <div class="panel reveal parallax-card" data-depth="10" style="padding:30px;align-self:center">
+        <span class="eyebrow">قبل أن تبدأ</span>
+        <h3>جهّز هذه البيانات</h3>
+        <div class="roadmap">
+          <div class="step-card"><div class="step-num">1</div><div><h3>اسم النطاق</h3><p>مثال: rawaj.cv أو www.rawaj.cv.</p></div></div>
+          <div class="step-card"><div class="step-num">2</div><div><h3>منصة النشر</h3><p>GitHub Pages أو Netlify أو Vercel أو أي استضافة ثابتة.</p></div></div>
+          <div class="step-card"><div class="step-num">3</div><div><h3>لوحة DNS</h3><p>الدخول إلى مزود النطاق لتعديل سجلات A وCNAME وTXT عند الحاجة.</p></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="domain-steps" class="reveal" style="margin-top:70px">
+      <div class="section-head">
+        <div><span class="eyebrow">خطوات الربط</span><h2>من إضافة النطاق إلى ظهور الموقع بشكل آمن.</h2></div>
+        <p>تختلف أسماء الحقول بين مزودي النطاق، لكن المبدأ واحد: أضف النطاق في منصة النشر ثم انسخ سجلات DNS المطلوبة إلى لوحة مزود النطاق.</p>
+      </div>
+      <div class="roadmap">
+        ${stepCard('01','أضف النطاق داخل منصة النشر','افتح إعدادات المشروع المنشور، اختر Domains أو Custom domains، ثم أضف النطاق الأساسي مثل example.com والنطاق الفرعي www.example.com.')}
+        ${stepCard('02','انسخ سجلات DNS المطلوبة','ستعرض المنصة سجلات مثل A أو CNAME أو TXT. انسخ القيم كما هي دون حذف النقاط أو تغيير الحروف.')}
+        ${stepCard('03','حدّث DNS لدى مزود النطاق','ادخل لوحة مزود النطاق، افتح DNS Management، ثم أضف أو عدّل السجلات المطلوبة واحذف السجلات المتعارضة عند الحاجة.')}
+        ${stepCard('04','فعّل HTTPS وانتظر الانتشار','بعد حفظ السجلات قد يستغرق الانتشار من دقائق إلى 24 ساعة. فعّل شهادة SSL أو خيار Enforce HTTPS بعد قبول النطاق.')}
+      </div>
+    </section>
+
+    <section class="reveal" style="margin-top:70px">
+      <div class="section-head">
+        <div><span class="eyebrow">أمثلة سجلات شائعة</span><h2>اعرف متى تستخدم كل سجل.</h2></div>
+      </div>
+      <div class="grid-3">
+        ${featureCard('A','النطاق الأساسي','يوجّه example.com إلى عناوين IP الخاصة بمنصة النشر، ويُستخدم غالباً مع GitHub Pages أو الاستضافات التي تعطي IP ثابتاً.')}
+        ${featureCard('CNAME','النطاق الفرعي','يوجّه www.example.com إلى عنوان تمنحه منصة النشر مثل project.netlify.app أو cname.vercel-dns.com.')}
+        ${featureCard('TXT','إثبات الملكية','تستخدمه بعض المنصات للتحقق من أنك تملك النطاق قبل تفعيل الربط أو شهادة الأمان.')}
+      </div>
+    </section>
+
+    <section class="reveal" style="margin-top:70px">
+      <div class="section-head">
+        <div><span class="eyebrow">تفادي الأخطاء</span><h2>مشكلات DNS الأكثر تكراراً وحلولها.</h2></div>
+      </div>
+      <div class="grid-2">
+        <article class="panel reveal">
+          <h3>النطاق لا يفتح الموقع</h3>
+          <p class="lead">تأكد أن السجلات محفوظة لدى مزود النطاق الصحيح، وأن قيمة CNAME لا تحتوي على https://، وأن سجل A لا يتعارض مع سجل قديم.</p>
+        </article>
+        <article class="panel reveal">
+          <h3>تحذير الأمان أو SSL</h3>
+          <p class="lead">انتظر اكتمال انتشار DNS ثم فعّل HTTPS من منصة النشر. إذا فشل الإصدار، احذف النطاق وأعد إضافته بعد التأكد من السجلات.</p>
+        </article>
+        <article class="panel reveal">
+          <h3>www يعمل والنطاق الأساسي لا يعمل</h3>
+          <p class="lead">أضف كلاً من example.com وwww.example.com داخل المنصة، واضبط التحويل بينهما كنسخة أساسية واحدة لتجنب التكرار.</p>
+        </article>
+        <article class="panel reveal">
+          <h3>تأخر ظهور التغييرات</h3>
+          <p class="lead">انتشار DNS قد يستغرق وقتاً حسب مزود النطاق وقيمة TTL. لا تغيّر السجلات مرات كثيرة خلال فترة الانتظار حتى لا يتأخر الانتشار.</p>
+        </article>
+      </div>
+    </section>
+
+    <article class="panel reveal" style="margin-top:70px">
+      <span class="eyebrow">قائمة تحقق نهائية</span>
+      <div class="values-grid">
+        <div class="value-card"><strong>النطاق مضاف</strong><p>أضف النطاق الأساسي ونسخة www في إعدادات المشروع.</p></div>
+        <div class="value-card"><strong>DNS مطابق</strong><p>قارن كل سجل وقيمة مع تعليمات منصة النشر.</p></div>
+        <div class="value-card"><strong>HTTPS مفعّل</strong><p>فعّل شهادة SSL والتحويل الآمن بعد قبول النطاق.</p></div>
+        <div class="value-card"><strong>تحويل موحد</strong><p>اختر نسخة واحدة أساسية: مع www أو بدونها.</p></div>
+      </div>
+      <div class="hero-actions"><a class="primary-btn" href="/contact" data-link>طلب مساعدة بربط النطاق</a><a class="secondary-btn" href="/" data-link>العودة للرئيسية</a></div>
     </article>
   `);
 }
@@ -1141,6 +1225,7 @@ function render() {
   else if (path === '/auth') app.innerHTML = authPage();
   else if (path === '/about') app.innerHTML = aboutPage();
   else if (path === '/deploy') app.innerHTML = deployPage();
+  else if (path === '/domain-guide') app.innerHTML = domainGuidePage();
   else if (path === '/contact') app.innerHTML = contactPage();
   else app.innerHTML = notFoundPage();
 
