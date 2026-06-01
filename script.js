@@ -259,6 +259,27 @@ function logoutCurrentUser() {
   render();
 }
 
+function getAccountSettings() {
+  const user = getCurrentUser();
+  const defaults = {
+    displayName: user?.name || '',
+    email: user?.email || '',
+    phone: '',
+    city: defaultResume.city,
+    preferredTemplate: localStorage.getItem('rawaj_selected_resume_template') || defaultResume.template,
+    emailUpdates: 'weekly',
+    profileVisibility: 'private',
+    language: 'ar'
+  };
+  const saved = localStorage.getItem('rawaj_account_settings');
+  return saved ? { ...defaults, ...JSON.parse(saved) } : defaults;
+}
+
+function saveAccountSettings(settings) {
+  localStorage.setItem('rawaj_account_settings', JSON.stringify({ ...settings, updatedAt: Date.now() }));
+  if (settings.preferredTemplate) localStorage.setItem('rawaj_selected_resume_template', settings.preferredTemplate);
+}
+
 function updateAuthNavState() {
   const user = getCurrentUser();
   if (!authNavLink) return;
@@ -372,14 +393,77 @@ function isDashboardPath(path) {
   return path === '/dashboard';
 }
 
+function isSettingsPath(path) {
+  return path === '/settings';
+}
+
 function isProtectedPath(path) {
-  return isBuilderPath(path) || isDashboardPath(path);
+  return isBuilderPath(path) || isDashboardPath(path) || isSettingsPath(path);
 }
 
 function consumeAuthRedirect() {
   const redirect = localStorage.getItem('rawaj_auth_redirect');
   localStorage.removeItem('rawaj_auth_redirect');
   return redirect && isProtectedPath(new URL(redirect, location.origin).pathname) ? redirect : '';
+}
+
+function accountSettingsPage() {
+  const user = getCurrentUser();
+  if (!user) return loginRequiredPage();
+  const settings = getAccountSettings();
+  return pageShell(`
+    <div class="section-head reveal">
+      <div><span class="eyebrow">إعدادات الحساب</span><h2>تحكم ببياناتك وتفضيلات تجربة روَاج.</h2></div>
+      <p>صفحة إعدادات محلية لإدارة الملف الشخصي، تفضيلات القوالب، التنبيهات، وخيارات أمان الحساب على هذا المتصفح.</p>
+    </div>
+    <div class="settings-layout">
+      <article class="form-card reveal">
+        <form class="account-settings-form" id="accountSettingsForm">
+          <h3>الملف الشخصي</h3>
+          <p class="settings-note">حدّث الاسم والبريد والمدينة التي تظهر في تجربة الحساب والسير الجديدة.</p>
+          <div class="form-grid">
+            <label>الاسم الظاهر<input required name="displayName" value="${escapeAttr(settings.displayName || user.name || '')}" autocomplete="name"></label>
+            <label>البريد الإلكتروني<input required type="email" name="email" value="${escapeAttr(settings.email || user.email || '')}" autocomplete="email"></label>
+            <label>رقم الهاتف<input name="phone" value="${escapeAttr(settings.phone)}" placeholder="+966 55 000 0000" autocomplete="tel"></label>
+            <label>المدينة<input name="city" value="${escapeAttr(settings.city)}" autocomplete="address-level2"></label>
+          </div>
+          <h3>تفضيلات المنصة</h3>
+          <div class="form-grid">
+            <label>القالب الافتراضي<select name="preferredTemplate">${templates.map(t => `<option value="${t.id}" ${t.id===settings.preferredTemplate?'selected':''}>${t.name}</option>`).join('')}</select></label>
+            <label>تنبيهات البريد<select name="emailUpdates"><option value="weekly" ${settings.emailUpdates==='weekly'?'selected':''}>ملخص أسبوعي</option><option value="important" ${settings.emailUpdates==='important'?'selected':''}>التحديثات المهمة فقط</option><option value="off" ${settings.emailUpdates==='off'?'selected':''}>إيقاف التنبيهات</option></select></label>
+            <label>خصوصية الملف<select name="profileVisibility"><option value="private" ${settings.profileVisibility==='private'?'selected':''}>خاص بي فقط</option><option value="link" ${settings.profileVisibility==='link'?'selected':''}>متاح عبر روابط المشاركة</option></select></label>
+            <label>لغة الواجهة<select name="language"><option value="ar" ${settings.language==='ar'?'selected':''}>العربية</option><option value="en" ${settings.language==='en'?'selected':''}>English لاحقاً</option></select></label>
+          </div>
+          <div class="action-row"><button class="primary-btn" type="submit">حفظ الإعدادات</button><button class="secondary-btn" type="button" data-action="reset-account-settings">استعادة الافتراضيات</button></div>
+        </form>
+      </article>
+      <aside class="settings-side reveal">
+        <article class="panel">
+          <span class="eyebrow">ملخص الحساب</span>
+          <div class="account-summary">
+            <div><span>طريقة التسجيل</span><strong>${escapeHtml(user.providerLabel || 'البريد الإلكتروني')}</strong></div>
+            <div><span>حالة الدفع</span><strong>${isPaymentActive() ? 'مفعّل للسير الإضافية' : 'الخطة المجانية'}</strong></div>
+            <div><span>آخر تحديث</span><strong>${formatDate(settings.updatedAt)}</strong></div>
+          </div>
+          <a class="secondary-btn" href="/dashboard" data-link>فتح لوحة السير</a>
+        </article>
+        <article class="panel settings-security">
+          <h3>الأمان وكلمة المرور</h3>
+          <p class="settings-note">يمكن تحديث كلمة مرور تجريبية محفوظة محلياً لحساب البريد الإلكتروني.</p>
+          <form class="account-settings-form" id="accountSecurityForm">
+            <label>كلمة مرور جديدة<input type="password" name="newPassword" minlength="6" placeholder="6 أحرف على الأقل" autocomplete="new-password"></label>
+            <label>تأكيد كلمة المرور<input type="password" name="confirmPassword" minlength="6" placeholder="أعد كتابة كلمة المرور" autocomplete="new-password"></label>
+            <button class="ghost-btn" type="submit">تحديث كلمة المرور</button>
+          </form>
+        </article>
+        <article class="panel settings-danger">
+          <h3>منطقة حساسة</h3>
+          <p>حذف الحساب يزيل جلسة الدخول وإعدادات الحساب من هذا المتصفح فقط.</p>
+          <div class="action-row"><button class="ghost-btn" type="button" data-action="auth-logout">تسجيل الخروج</button><button class="mini-btn" type="button" data-action="delete-account-data">حذف بيانات الحساب</button></div>
+        </article>
+      </aside>
+    </div>
+  `);
 }
 
 function routeLink(html) {
@@ -440,7 +524,7 @@ function authPage() {
             <div><span>البريد الإلكتروني</span><strong>${escapeHtml(user.email || 'غير محدد')}</strong></div>
             <div><span>طريقة التسجيل</span><strong>${escapeHtml(user.providerLabel)}</strong></div>
           </div>
-          <div class="hero-actions"><a class="primary-btn" href="/dashboard" data-link>الانتقال للوحة السير</a><button class="secondary-btn" type="button" data-action="auth-logout">تسجيل الخروج</button></div>
+          <div class="hero-actions"><a class="primary-btn" href="/dashboard" data-link>الانتقال للوحة السير</a><a class="secondary-btn" href="/settings" data-link>إعدادات الحساب</a><button class="secondary-btn" type="button" data-action="auth-logout">تسجيل الخروج</button></div>
         </article>
         <aside class="auth-benefits reveal">
           ${featureCard('✓','حفظ بيانات الحساب','احتفظ باسمك وبريدك لاستخدامهما في السير والإيصالات لاحقاً.')}
@@ -941,11 +1025,18 @@ function loginRequiredPage() {
   const redirectPath = `${location.pathname}${location.search}`;
   localStorage.setItem('rawaj_auth_redirect', redirectPath);
   const isDashboard = isDashboardPath(location.pathname);
+  const isSettings = isSettingsPath(location.pathname);
+  const title = isDashboard ? 'سجّل دخولك قبل فتح لوحة السير.' : isSettings ? 'سجّل دخولك قبل إدارة إعدادات الحساب.' : 'سجّل دخولك قبل إنشاء السيرة الذاتية.';
+  const message = isDashboard
+    ? 'لوحة السير تحتوي على سيرك المحفوظة وإجراءات التعديل والمعاينة، لذلك يجب تسجيل الدخول قبل الوصول إليها.'
+    : isSettings
+      ? 'إعدادات الحساب تحتوي على بياناتك وتفضيلاتك الشخصية، لذلك يجب تسجيل الدخول قبل تعديلها.'
+      : 'حماية إنشاء السير تضمن حفظ بياناتك وقوالبك داخل حساب روَاج، ثم يمكنك العودة مباشرة إلى منشئ السيرة بعد التسجيل.';
   return pageShell(`
     <article class="panel reveal" style="max-width:760px;margin:auto;text-align:center">
       <span class="eyebrow">تسجيل الدخول مطلوب</span>
-      <h2>${isDashboard ? 'سجّل دخولك قبل فتح لوحة السير.' : 'سجّل دخولك قبل إنشاء السيرة الذاتية.'}</h2>
-      <p class="lead" style="margin-inline:auto">${isDashboard ? 'لوحة السير تحتوي على سيرك المحفوظة وإجراءات التعديل والمعاينة، لذلك يجب تسجيل الدخول قبل الوصول إليها.' : 'حماية إنشاء السير تضمن حفظ بياناتك وقوالبك داخل حساب روَاج، ثم يمكنك العودة مباشرة إلى منشئ السيرة بعد التسجيل.'}</p>
+      <h2>${title}</h2>
+      <p class="lead" style="margin-inline:auto">${message}</p>
       <div class="hero-actions" style="justify-content:center">
         <a class="primary-btn" href="/auth" data-link>تسجيل الدخول أو إنشاء حساب</a>
         <a class="secondary-btn" href="/templates" data-link>استعراض القوالب أولاً</a>
@@ -967,6 +1058,7 @@ function render() {
   else if (path === '/builder') app.innerHTML = getCurrentUser() ? builderPage() : loginRequiredPage();
   else if (parts[0] === 'builder' && parts[1]) app.innerHTML = getCurrentUser() ? builderPage(parts[1]) : loginRequiredPage();
   else if (path === '/dashboard') app.innerHTML = getCurrentUser() ? dashboardPage() : loginRequiredPage();
+  else if (path === '/settings') app.innerHTML = getCurrentUser() ? accountSettingsPage() : loginRequiredPage();
   else if (parts[0] === 'preview' && parts[1]) app.innerHTML = savedPreviewPage(parts[1]);
   else if (path === '/ai') app.innerHTML = aiPage();
   else if (path === '/pricing') app.innerHTML = pricingPage();
@@ -1037,6 +1129,12 @@ function bindPageEvents() {
 
   const authForm = document.getElementById('authForm');
   if (authForm) authForm.addEventListener('submit', handleEmailRegistration);
+
+  const accountSettingsForm = document.getElementById('accountSettingsForm');
+  if (accountSettingsForm) accountSettingsForm.addEventListener('submit', handleAccountSettingsSubmit);
+
+  const accountSecurityForm = document.getElementById('accountSecurityForm');
+  if (accountSecurityForm) accountSecurityForm.addEventListener('submit', handleAccountSecuritySubmit);
 }
 
 function handleAction(event) {
@@ -1045,6 +1143,8 @@ function handleAction(event) {
   const id = event.currentTarget.dataset.id;
   if (action === 'auth-social') { completeSocialRegistration(event.currentTarget.dataset.provider); return; }
   if (action === 'auth-logout') { logoutCurrentUser(); return; }
+  if (action === 'reset-account-settings') { resetAccountSettings(); return; }
+  if (action === 'delete-account-data') { deleteAccountData(); return; }
   if (action === 'ai-write-summary') { suggestResumeContent('summary'); return; }
   if (action === 'ai-write-experience') { suggestResumeContent('experience'); return; }
   if (action === 'ai-write-skills') { suggestResumeContent('skills'); return; }
@@ -1093,6 +1193,60 @@ function handleAction(event) {
     showToast('تم حذف السيرة');
     render();
   }
+}
+
+function handleAccountSettingsSubmit(event) {
+  event.preventDefault();
+  const user = getCurrentUser();
+  if (!user) return;
+  const data = Object.fromEntries(new FormData(event.currentTarget));
+  const settings = {
+    displayName: (data.displayName || '').trim(),
+    email: (data.email || '').trim().toLowerCase(),
+    phone: (data.phone || '').trim(),
+    city: (data.city || '').trim(),
+    preferredTemplate: data.preferredTemplate || defaultResume.template,
+    emailUpdates: data.emailUpdates || 'weekly',
+    profileVisibility: data.profileVisibility || 'private',
+    language: data.language || 'ar'
+  };
+  if (!settings.displayName || !settings.email) {
+    showToast('أدخل الاسم والبريد الإلكتروني قبل الحفظ');
+    return;
+  }
+  saveAccountSettings(settings);
+  saveCurrentUser({ ...user, name: settings.displayName, email: settings.email });
+  showToast('تم حفظ إعدادات الحساب');
+  render();
+}
+
+function handleAccountSecuritySubmit(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const data = Object.fromEntries(new FormData(form));
+  if (!data.newPassword || data.newPassword.length < 6 || data.newPassword !== data.confirmPassword) {
+    showToast('أدخل كلمة مرور متطابقة من 6 أحرف على الأقل');
+    return;
+  }
+  localStorage.setItem('rawaj_account_password_updated_at', String(Date.now()));
+  form.reset();
+  showToast('تم تحديث كلمة المرور التجريبية محلياً');
+}
+
+function resetAccountSettings() {
+  localStorage.removeItem('rawaj_account_settings');
+  showToast('تمت استعادة إعدادات الحساب الافتراضية');
+  render();
+}
+
+function deleteAccountData() {
+  const ok = confirm('هل تريد حذف بيانات الحساب من هذا المتصفح؟');
+  if (!ok) return;
+  localStorage.removeItem('rawaj_current_user');
+  localStorage.removeItem('rawaj_account_settings');
+  localStorage.removeItem('rawaj_auth_redirect');
+  showToast('تم حذف بيانات الحساب المحلية');
+  navigate('/auth');
 }
 
 function handleEmailRegistration(event) {
