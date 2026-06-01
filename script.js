@@ -81,6 +81,59 @@ templates.push(
   { id: 'manufacturing-line', name: 'خط التصنيع', category: 'تصنيع', tone: 'عملي', popularity: 84, accent: '#475569', pages: 'صفحتان', desc: 'يركز على الإنتاجية، السلامة، الصيانة، وتقليل الهدر.', tags: ['إنتاج', 'سلامة', 'صيانة'] }
 );
 
+const templateShapeStyles = [
+  { key: 'folio', label: 'ورقي', tone: 'رسمي', pages: 'صفحة واحدة' },
+  { key: 'arch', label: 'قوسي', tone: 'راقي', pages: 'صفحتان' },
+  { key: 'diagonal', label: 'مائل', tone: 'جريء', pages: 'صفحة واحدة' },
+  { key: 'sidebar', label: 'شريط جانبي', tone: 'منظم', pages: 'صفحتان' },
+  { key: 'capsule', label: 'كبسولي', tone: 'حديث', pages: 'صفحة واحدة' }
+];
+
+const templateExpansionGroups = [
+  { slug: 'accounting', name: 'المحاسبة', category: 'محاسبة', accent: '#0f766e', tags: ['دفاتر', 'تقارير', 'تدقيق'], symbol: 'مح', desc: 'للمحاسبين ومراجعي الحسابات مع إبراز التقارير والدقة المالية.' },
+  { slug: 'procurement', name: 'المشتريات', category: 'مشتريات', accent: '#a16207', tags: ['توريد', 'تفاوض', 'عقود'], symbol: 'مش', desc: 'يعرض إدارة الموردين والتفاوض وخفض التكلفة بوضوح.' },
+  { slug: 'call-center', name: 'مركز الاتصال', category: 'خدمة العملاء', accent: '#0284c7', tags: ['اتصال', 'رضا', 'SLA'], symbol: 'ات', desc: 'يركز على سرعة الاستجابة ورضا العملاء ومؤشرات الخدمة.' },
+  { slug: 'content', name: 'صناعة المحتوى', category: 'محتوى', accent: '#db2777', tags: ['كتابة', 'منصات', 'هوية'], symbol: 'حت', desc: 'قالب لكتّاب المحتوى ومديري التحرير مع مساحة للأعمال المنشورة.' },
+  { slug: 'photography', name: 'التصوير', category: 'تصوير', accent: '#7c2d12', tags: ['إضاءة', 'معرض', 'تحرير'], symbol: 'صو', desc: 'يعرض البورتفوليو والخبرات البصرية والبرامج المستخدمة.' },
+  { slug: 'game-dev', name: 'تطوير الألعاب', category: 'ألعاب', accent: '#6d28d9', tags: ['Unity', 'تجربة', 'محركات'], symbol: 'لع', desc: 'لمطوري الألعاب مع إبراز المشاريع والمحركات وتجربة اللاعب.' },
+  { slug: 'mobile-dev', name: 'تطبيقات الجوال', category: 'تقني', accent: '#2563eb', tags: ['iOS', 'Android', 'إطلاق'], symbol: 'جو', desc: 'يرتب التطبيقات المنشورة والمكتبات ونتائج الأداء.' },
+  { slug: 'frontend', name: 'واجهات الويب', category: 'تقني', accent: '#0891b2', tags: ['React', 'UI', 'أداء'], symbol: 'وب', desc: 'يوازن بين تجربة المستخدم وجودة الواجهة وسرعة التحميل.' },
+  { slug: 'backend', name: 'الخدمات الخلفية', category: 'تقني', accent: '#334155', tags: ['API', 'قواعد بيانات', 'أمان'], symbol: 'خل', desc: 'يركز على المعمارية والأنظمة الموزعة وقابلية التوسع.' },
+  { slug: 'agriculture', name: 'الزراعة', category: 'زراعة', accent: '#65a30d', tags: ['محاصيل', 'استدامة', 'ري'], symbol: 'زر', desc: 'للمهندسين الزراعيين وإدارة الإنتاج والاستدامة.' },
+  { slug: 'veterinary', name: 'الطب البيطري', category: 'بيطري', accent: '#16a34a', tags: ['رعاية', 'تشخيص', 'عيادات'], symbol: 'بي', desc: 'يعرض الخبرة السريرية والتراخيص ورعاية الحيوانات.' },
+  { slug: 'therapy', name: 'العلاج والتأهيل', category: 'صحي', accent: '#14b8a6', tags: ['تأهيل', 'خطط', 'متابعة'], symbol: 'عل', desc: 'للمعالجين الفيزيائيين والمهنيين مع إبراز خطط العلاج.' },
+  { slug: 'journalism', name: 'الصحافة', category: 'إعلام', accent: '#be123c', tags: ['تحقيق', 'تحرير', 'مصادر'], symbol: 'صح', desc: 'يناسب الصحفيين والمحررين مع مساحة للقصص والتحقيقات.' },
+  { slug: 'tourism', name: 'السياحة', category: 'سياحة', accent: '#f97316', tags: ['رحلات', 'ضيوف', 'وجهات'], symbol: 'سي', desc: 'لقطاع السفر والإرشاد السياحي وخدمة الزوار.' },
+  { slug: 'training', name: 'التدريب المهني', category: 'تدريب', accent: '#8b5cf6', tags: ['ورش', 'مهارات', 'قياس'], symbol: 'در', desc: 'للمدربين مع إبراز المناهج ونتائج المتدربين.' }
+];
+
+templateExpansionGroups.forEach((group, groupIndex) => {
+  templateShapeStyles.forEach((style, styleIndex) => {
+    const popularity = 78 + ((groupIndex * 5 + styleIndex) % 20);
+    templates.push({
+      id: `${group.slug}-${style.key}`,
+      name: `${style.label} ${group.name}`,
+      category: group.category,
+      tone: style.tone,
+      popularity,
+      accent: group.accent,
+      pages: style.pages,
+      desc: `${group.desc} بتصميم ${style.label} متنوع الألوان ومناسب للفرز السريع.`,
+      tags: [...group.tags, style.label],
+      avatarText: group.symbol,
+      shape: style.key,
+      layout: styleIndex % 2 === 0 ? 'stacked' : 'split'
+    });
+  });
+});
+
+templates.forEach((template, index) => {
+  template.shape = template.shape || templateShapeStyles[index % templateShapeStyles.length].key;
+  template.layout = template.layout || (index % 2 === 0 ? 'stacked' : 'split');
+  template.avatarText = template.avatarText || template.name.replace(/^(ال|أ|إ|آ)/, '').slice(0, 2);
+  template.avatar = template.avatar || createTemplateAvatar(template, index);
+});
+
 const plans = [
   { name: 'التجربة الأولى', price: 'مجاني', desc: 'أول سيرة ذاتية مجانية بالكامل لتبدأ بثقة.', items: ['سيرة ذاتية واحدة مجاناً', 'قالبان احترافيان', 'تعديل غير محدود على السيرة الأولى', 'تصدير نص منسق'] },
   { name: 'المحترف', price: '49 ر.س', desc: 'بعد السيرة الأولى، أنشئ سيراً إضافية عبر دفع آمن.', items: ['كل القوالب', 'سير إضافية مدفوعة', 'مراجعة ذكية للنص', 'الدفع عبر Apple Pay أو البطاقة'], featured: true },
@@ -227,7 +280,7 @@ function homePage() {
           <a class="secondary-btn" href="/templates" data-link>استعرض القوالب</a>
         </div>
         <div class="hero-metrics">
-          <div class="metric-card"><strong>50+</strong><span>قالباً مهنياً متنوعاً</span></div>
+          <div class="metric-card"><strong>${templates.length}+</strong><span>قالباً مهنياً متنوعاً</span></div>
           <div class="metric-card"><strong>3D</strong><span>تجربة تفاعلية عميقة</span></div>
           <div class="metric-card"><strong>24/7</strong><span>حفظ وتعديل من أي مكان</span></div>
         </div>
@@ -276,10 +329,18 @@ function stepCard(num, title, text) {
 }
 
 function templateCard(t) {
+  const avatar = t.avatar || createTemplateAvatar(t);
+  const shape = t.shape || 'folio';
+  const layout = t.layout || 'stacked';
   return `<article class="template-card reveal">
-    <div class="template-preview"><div class="template-mini" style="--accent:${t.accent}"><div class="top"></div><div class="row"></div><div class="row"></div><div class="row"></div><div class="row"></div></div></div>
+    <div class="template-preview">
+      <div class="template-mini shape-${shape} layout-${layout}" style="--accent:${t.accent}">
+        <div class="top"><img class="template-avatar" src="${avatar}" alt="صورة رمزية لقالب ${escapeAttr(t.name)}"></div>
+        <div class="row"></div><div class="row"></div><div class="row"></div><div class="row"></div>
+      </div>
+    </div>
     <div class="template-body">
-      <h3>${t.name}</h3>
+      <div class="template-title-row"><img class="template-card-avatar" src="${avatar}" alt=""><div><h3>${t.name}</h3><small>${t.category} · ${t.tone}</small></div></div>
       <p>${t.desc}</p>
       <div class="tags">${t.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>
       <div class="action-row">
@@ -288,6 +349,24 @@ function templateCard(t) {
       </div>
     </div>
   </article>`;
+}
+
+function createTemplateAvatar(template, index = 0) {
+  const initials = escapeHtml(template.avatarText || template.name.slice(0, 2));
+  const accent = template.accent || '#0d5d56';
+  const shape = template.shape || templateShapeStyles[index % templateShapeStyles.length]?.key || 'folio';
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+      <defs>
+        <linearGradient id="g" x1="0" x2="1" y1="0" y2="1"><stop stop-color="${accent}"/><stop offset="1" stop-color="#f4b23c"/></linearGradient>
+      </defs>
+      <rect width="128" height="128" rx="34" fill="#fffaf0"/>
+      <path d="M18 26 C36 8 86 10 108 32 L108 102 C82 118 42 118 18 98 Z" fill="url(#g)" opacity=".95"/>
+      <circle cx="96" cy="28" r="14" fill="#fffaf0" opacity=".78"/>
+      <path d="${shape === 'arch' ? 'M34 96V50a30 30 0 0 1 60 0v46Z' : shape === 'diagonal' ? 'M28 88 92 28l12 12-64 60Z' : shape === 'sidebar' ? 'M28 28h22v72H28zM60 34h42v12H60zM60 58h34v10H60zM60 80h26v10H60z' : shape === 'capsule' ? 'M34 36h60a18 18 0 0 1 0 36H34a18 18 0 0 1 0-36Z' : 'M32 30h64v72H32z'}" fill="#fffaf0" opacity=".33"/>
+      <text x="64" y="76" text-anchor="middle" font-size="30" font-family="Arial, sans-serif" font-weight="700" fill="#fffaf0">${initials}</text>
+    </svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
 
 function templatesPage() {
