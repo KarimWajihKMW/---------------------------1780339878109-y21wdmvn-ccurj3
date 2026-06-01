@@ -1091,15 +1091,110 @@ async function shareResumeLink(id) {
 }
 
 function printResumePdf(title) {
-  const previousTitle = document.title;
-  document.title = `${title} - روَاج PDF`;
-  document.body.classList.add('print-resume');
-  showToast('اختر "حفظ كملف PDF" من نافذة الطباعة');
-  setTimeout(() => window.print(), 120);
+  const resumePaper = document.querySelector('.preview-paper');
+  if (!resumePaper) return;
+
+  const printFrame = document.createElement('iframe');
+  printFrame.title = `${title} - روَاج PDF`;
+  printFrame.setAttribute('aria-hidden', 'true');
+  printFrame.style.position = 'fixed';
+  printFrame.style.left = '-10000px';
+  printFrame.style.top = '0';
+  printFrame.style.width = '1px';
+  printFrame.style.height = '1px';
+  printFrame.style.border = '0';
+
+  const paperClone = resumePaper.cloneNode(true);
+  const paperStyle = getComputedStyle(resumePaper);
+  paperClone.style.borderTop = `${paperStyle.borderTopWidth} solid ${paperStyle.borderTopColor}`;
+
+  const removePrintFrame = () => {
+    setTimeout(() => printFrame.remove(), 250);
+  };
+
+  document.body.appendChild(printFrame);
+  const printDocument = printFrame.contentDocument || printFrame.contentWindow?.document;
+  if (!printDocument) {
+    printFrame.remove();
+    return;
+  }
+
+  printDocument.open();
+  printDocument.write(`
+    <!DOCTYPE html>
+    <html lang="ar" dir="rtl">
+    <head>
+      <meta charset="UTF-8">
+      <title>${escapeHtml(title)} - روَاج PDF</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Reem+Kufi:wght@500;600;700&display=swap" rel="stylesheet">
+      <style>${resumePrintDocumentCss()}</style>
+    </head>
+    <body>
+      <main class="print-template-only"></main>
+    </body>
+    </html>
+  `);
+  printDocument.close();
+  printDocument.querySelector('.print-template-only')?.appendChild(paperClone);
+
+  showToast('سيتم طباعة القالب فقط، ويمكنك اختيار "حفظ كملف PDF"');
   setTimeout(() => {
-    document.body.classList.remove('print-resume');
-    document.title = previousTitle;
-  }, 900);
+    printFrame.contentWindow?.focus();
+    printFrame.contentWindow?.addEventListener('afterprint', removePrintFrame, { once: true });
+    printFrame.contentWindow?.print();
+    setTimeout(removePrintFrame, 1400);
+  }, 250);
+}
+
+function resumePrintDocumentCss() {
+  return `
+    @page { size: A4; margin: 12mm; }
+    :root {
+      --ink: #17120b;
+      --muted: #786b59;
+      --paper: #fffaf0;
+      --teal: #0d5d56;
+      --copper: #b5632a;
+      --font-body: 'IBM Plex Sans Arabic', Arial, sans-serif;
+      --font-display: 'Reem Kufi', 'IBM Plex Sans Arabic', Arial, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: #ffffff; color: var(--ink); font-family: var(--font-body); direction: rtl; }
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .print-template-only { width: 100%; }
+    .preview-paper {
+      width: 100%;
+      min-height: auto;
+      margin: 0;
+      padding: 18mm;
+      border-radius: 0;
+      background: #ffffff;
+      color: var(--ink);
+      box-shadow: none;
+      font-family: var(--font-body);
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .preview-paper h3 {
+      margin: 0 0 6px;
+      color: var(--teal);
+      font-family: var(--font-display);
+      font-size: 30px;
+      line-height: 1.2;
+    }
+    .preview-paper p { margin: 8px 0; color: #4e4131; line-height: 1.85; white-space: pre-line; }
+    .preview-role { color: var(--copper); font-weight: 900; margin-bottom: 8px; }
+    .preview-section { margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(111,55,28,.16); page-break-inside: avoid; }
+    .preview-section strong { display: block; color: var(--teal); margin-bottom: 8px; font-weight: 900; }
+    .skill-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+    .skill-pills span { background: rgba(13,93,86,.08); color: var(--teal); padding: 6px 10px; border-radius: 999px; font-weight: 800; font-size: 12px; }
+    @media print {
+      html, body { width: 210mm; }
+      .preview-paper { padding: 0; }
+    }
+  `;
 }
 
 function resumeDocumentHtml(data) {
