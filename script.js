@@ -600,7 +600,7 @@ function authPage() {
             <label>البريد الإلكتروني<input required type="email" name="email" placeholder="you@example.com" autocomplete="email"></label>
           </div>
           <label>كلمة المرور<input required type="password" name="password" minlength="6" placeholder="6 أحرف على الأقل" autocomplete="new-password"></label>
-          <label class="check-line"><input required type="checkbox" name="terms"> <span>أوافق على حفظ بيانات الحساب محلياً لاستخدام تجربة روَاج.</span></label>
+          <label class="check-line"><input required type="checkbox" name="terms"> <span>أوافق على <a href="/terms" data-link>الشروط والأحكام</a> وحفظ بيانات الحساب محلياً لاستخدام تجربة روَاج.</span></label>
           <button class="primary-btn" type="submit">إنشاء حساب بالبريد</button>
         </form>
       </article>
@@ -1095,6 +1095,55 @@ function privacyPolicyPage() {
   `);
 }
 
+function termsAndConditionsPage() {
+  return pageShell(`
+    <div class="section-head reveal">
+      <div><span class="eyebrow">الشروط والأحكام</span><h2>اتفاق واضح لاستخدام منصة روَاج بثقة.</h2></div>
+      <p>توضح هذه الشروط قواعد استخدام صفحات روَاج، منشئ السيرة الذاتية، القوالب، الحسابات، الدفع التجريبي، والبيانات المحفوظة محلياً داخل المتصفح.</p>
+    </div>
+    <div class="grid-2">
+      <article class="panel reveal">
+        <h3>قبول الشروط</h3>
+        <p class="lead">باستخدامك للمنصة أو إنشاء حساب أو حفظ قالب سيرة، فإنك توافق على الالتزام بهذه الشروط وأي تحديثات مستقبلية يتم نشرها في هذه الصفحة.</p>
+      </article>
+      <article class="panel reveal">
+        <h3>طبيعة الخدمة</h3>
+        <p class="lead">روَاج يقدم تجربة موقع ثابتة لإنشاء ومعاينة السير الذاتية والقوالب، مع أدوات مساعدة للكتابة والتخصيص. لا تضمن المنصة الحصول على وظيفة أو قبول طلب توظيف.</p>
+      </article>
+      <article class="panel reveal">
+        <h3>مسؤولية المستخدم</h3>
+        <p class="lead">أنت مسؤول عن صحة البيانات التي تدخلها، وعن مراجعة النصوص المقترحة قبل استخدامها، وعن عدم إدخال معلومات تخص الآخرين دون إذن واضح منهم.</p>
+      </article>
+      <article class="panel reveal">
+        <h3>الحساب والتخزين المحلي</h3>
+        <p class="lead">تُحفظ بيانات الحساب والإعدادات والسير والإيصالات محلياً في متصفحك عبر localStorage في هذه النسخة، ويمكن حذفها من الإعدادات أو عبر مسح بيانات المتصفح.</p>
+      </article>
+      <article class="panel reveal">
+        <h3>القوالب وحقوق الاستخدام</h3>
+        <p class="lead">القوالب والتصميمات داخل روَاج مخصصة لمساعدتك على إعداد سيرتك الذاتية. لا يجوز نسخ واجهة المنصة أو إعادة بيع القوالب كمنتج مستقل دون موافقة مسبقة.</p>
+      </article>
+      <article class="panel reveal">
+        <h3>الدفع والإيصالات</h3>
+        <p class="lead">تتضمن المنصة تجربة دفع محلية لأغراض العرض. عند ربط بوابة دفع فعلية لاحقاً، ستخضع العمليات لسياسات مزود الدفع ورسوم الخطة المعروضة وقت الشراء.</p>
+      </article>
+      <article class="panel reveal">
+        <h3>الاستخدام المقبول</h3>
+        <p class="lead">يُمنع استخدام المنصة لإدخال محتوى مضلل أو مخالف للأنظمة أو ينتهك حقوق الملكية أو الخصوصية، كما يحق لروَاج تقييد أي استخدام يسيء للتجربة أو العلامة.</p>
+      </article>
+      <article class="panel reveal">
+        <h3>حدود المسؤولية</h3>
+        <p class="lead">تُقدم المنصة كما هي، وقد تختلف النتائج حسب دقة البيانات وطريقة الاستخدام. لا تتحمل روَاج مسؤولية قرارات التوظيف أو أي خسائر ناتجة عن استخدام المحتوى دون مراجعة.</p>
+      </article>
+    </div>
+    <article class="panel reveal" style="margin-top:26px">
+      <span class="eyebrow">التحديثات والتواصل</span>
+      <h3>قد يتم تحديث هذه الشروط عند تطوير الخدمة.</h3>
+      <p class="lead">سننشر النسخة الأحدث في هذه الصفحة. إذا كان لديك سؤال حول الشروط أو الخصوصية، يمكنك التواصل معنا مباشرة.</p>
+      <div class="hero-actions"><a class="primary-btn" href="/contact" data-link>تواصل معنا</a><a class="secondary-btn" href="/privacy" data-link>سياسة الخصوصية</a></div>
+    </article>
+  `);
+}
+
 function deployPage() {
   return pageShell(`
     <div class="section-head reveal">
@@ -1280,6 +1329,7 @@ function render() {
   else if (path === '/auth') app.innerHTML = authPage();
   else if (path === '/about') app.innerHTML = aboutPage();
   else if (path === '/privacy') app.innerHTML = privacyPolicyPage();
+  else if (path === '/terms') app.innerHTML = termsAndConditionsPage();
   else if (path === '/deploy') app.innerHTML = deployPage();
   else if (path === '/domain-guide') app.innerHTML = domainGuidePage();
   else if (path === '/contact') app.innerHTML = contactPage();
