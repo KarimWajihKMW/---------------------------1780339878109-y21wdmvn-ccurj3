@@ -14,9 +14,14 @@ const templates = [
 ];
 
 const plans = [
-  { name: 'البداية', price: 'مجاني', desc: 'لإنشاء أول سيرة ذاتية بشكل سريع.', items: ['قالبان احترافيان', 'حفظ 3 سير ذاتية', 'تعديل غير محدود', 'تصدير نص منسق'] },
-  { name: 'المحترف', price: '49 ر.س', desc: 'للجادين في التقديم على فرص أفضل.', items: ['كل القوالب', 'حفظ 25 سيرة', 'مراجعة ذكية للنص', 'نسخ مخصصة لكل وظيفة'], featured: true },
-  { name: 'الشركات', price: '199 ر.س', desc: 'لفرق التوظيف ومراكز التدريب.', items: ['حسابات متعددة', 'مكتبة قوالب موحدة', 'لوحة متابعة المتدربين', 'دعم محتوى مهني'] }
+  { name: 'التجربة الأولى', price: 'مجاني', desc: 'أول سيرة ذاتية مجانية بالكامل لتبدأ بثقة.', items: ['سيرة ذاتية واحدة مجاناً', 'قالبان احترافيان', 'تعديل غير محدود على السيرة الأولى', 'تصدير نص منسق'] },
+  { name: 'المحترف', price: '49 ر.س', desc: 'بعد السيرة الأولى، أنشئ سيراً إضافية عبر دفع آمن.', items: ['كل القوالب', 'سير إضافية مدفوعة', 'مراجعة ذكية للنص', 'الدفع عبر Apple Pay أو البطاقة'], featured: true },
+  { name: 'الشركات', price: '199 ر.س', desc: 'لفرق التوظيف ومراكز التدريب.', items: ['حسابات متعددة', 'مكتبة قوالب موحدة', 'لوحة متابعة المتدربين', 'دفع مؤسسي بالبطاقات'] }
+];
+
+const paymentMethods = [
+  { id: 'apple-pay', name: 'Apple Pay', icon: '', desc: 'دفع سريع وآمن من أجهزة Apple المدعومة.' },
+  { id: 'card', name: 'بطاقة بنكية', icon: '▣', desc: 'أضف بطاقة مدى، فيزا، أو ماستركارد لإكمال الدفع.' }
 ];
 
 const defaultResume = {
@@ -42,7 +47,8 @@ const state = {
   templateSort: 'popular',
   dashboardPage: 1,
   dashboardSearch: '',
-  dashboardSort: 'updated'
+  dashboardSort: 'updated',
+  paymentMethod: 'apple-pay'
 };
 
 const app = document.getElementById('app');
@@ -63,6 +69,22 @@ function getSavedResumes() {
 
 function saveResumes(resumes) {
   localStorage.setItem('rawaj_resumes', JSON.stringify(resumes));
+}
+
+function isPaymentActive() {
+  return localStorage.getItem('rawaj_payment_status') === 'paid';
+}
+
+function hasUsedFreeResume() {
+  return localStorage.getItem('rawaj_free_resume_used') === 'true';
+}
+
+function shouldChargeForNewResume() {
+  return hasUsedFreeResume() && !isPaymentActive();
+}
+
+function markFreeResumeUsed() {
+  localStorage.setItem('rawaj_free_resume_used', 'true');
 }
 
 function cryptoId() {
@@ -264,7 +286,12 @@ function builderPage(editId = '') {
   return pageShell(`
     <div class="section-head reveal">
       <div><span class="eyebrow">منشئ السيرة</span><h2>${existing ? 'تعديل سيرة محفوظة' : 'أنشئ سيرة ذاتية قابلة للحفظ والتعديل.'}</h2></div>
-      <p>املأ الحقول وشاهد معاينة حية بتصميم ثلاثي العمق. عند الحفظ ستظهر السيرة في لوحة السير مع إجراءات كاملة.</p>
+      <p>أول سيرة ذاتية مجانية، وبعدها يتطلب إنشاء سير إضافية دفعاً آمناً عبر Apple Pay أو بطاقة بنكية.</p>
+    </div>
+    <div class="billing-alert reveal ${isPaymentActive() ? 'paid' : ''}">
+      <strong>${isPaymentActive() ? 'الدفع مفعّل' : hasUsedFreeResume() ? 'تم استخدام السيرة المجانية' : 'السيرة الأولى مجانية'}</strong>
+      <span>${isPaymentActive() ? 'يمكنك إنشاء سير إضافية الآن.' : hasUsedFreeResume() ? 'سيتم تحويلك للدفع عند حفظ سيرة جديدة.' : 'احفظ أول سيرة بدون دفع، ثم تصبح السير الإضافية مدفوعة.'}</span>
+      ${!isPaymentActive() && hasUsedFreeResume() ? '<a class="mini-btn" href="/checkout" data-link>الدفع الآن</a>' : ''}
     </div>
     <div class="builder-layout">
       <article class="form-card reveal">
@@ -338,8 +365,36 @@ function dashboardPage() {
 
 function pricingPage() {
   return pageShell(`
-    <div class="section-head reveal"><div><span class="eyebrow">خطط مرنة</span><h2>ابدأ مجاناً ثم وسّع حضورك المهني.</h2></div><p>اختر الخطة التي تناسب عدد السير، مستوى التخصيص، واحتياجك لمراجعة المحتوى.</p></div>
-    <div class="grid-3">${plans.map(plan => `<article class="plan-card reveal ${plan.featured?'featured':''}"><h3>${plan.name}</h3><p>${plan.desc}</p><div class="price">${plan.price}</div><ul>${plan.items.map(i=>`<li>${i}</li>`).join('')}</ul><a class="${plan.featured?'secondary-btn':'primary-btn'}" href="/builder" data-link>اختيار الخطة</a></article>`).join('')}</div>
+    <div class="section-head reveal"><div><span class="eyebrow">خطط مرنة</span><h2>ابدأ مجاناً ثم وسّع حضورك المهني.</h2></div><p>السيرة الأولى مجانية بالكامل، وبعدها يمكنك الدفع بأمان عبر Apple Pay أو إضافة بطاقة بنكية.</p></div>
+    <div class="grid-3">${plans.map((plan, index) => `<article class="plan-card reveal ${plan.featured?'featured':''}"><h3>${plan.name}</h3><p>${plan.desc}</p><div class="price">${plan.price}</div><ul>${plan.items.map(i=>`<li>${i}</li>`).join('')}</ul><a class="${plan.featured?'secondary-btn':'primary-btn'}" href="${index === 0 ? '/builder' : '/checkout'}" data-link>${index === 0 ? 'ابدأ مجاناً' : 'الدفع الآن'}</a></article>`).join('')}</div>
+  `);
+}
+
+function checkoutPage() {
+  return pageShell(`
+    <div class="section-head reveal">
+      <div><span class="eyebrow">الدفع الآمن</span><h2>أكمل إنشاء السير الإضافية.</h2></div>
+      <p>بعد أول سيرة مجانية، فعّل الدفع مرة واحدة لاستخدام القوالب وحفظ سير إضافية عبر Apple Pay أو البطاقة.</p>
+    </div>
+    <div class="checkout-layout">
+      <article class="panel reveal">
+        <h3>اختر طريقة الدفع</h3>
+        <div class="payment-methods">
+          ${paymentMethods.map(method => `<button type="button" class="payment-method ${state.paymentMethod === method.id ? 'active' : ''}" data-action="payment-method" data-method="${method.id}"><span>${method.icon}</span><strong>${method.name}</strong><small>${method.desc}</small></button>`).join('')}
+        </div>
+        <div class="billing-summary">
+          <span>سيرة أولى</span><strong>مجانية</strong>
+          <span>السير الإضافية</span><strong>49 ر.س</strong>
+          <span>الحالة</span><strong>${isPaymentActive() ? 'مدفوع' : 'بانتظار الدفع'}</strong>
+        </div>
+      </article>
+      <article class="form-card reveal">
+        <form class="payment-form" id="paymentForm">
+          <h3>${state.paymentMethod === 'apple-pay' ? 'الدفع عبر Apple Pay' : 'إضافة بطاقة بنكية'}</h3>
+          ${state.paymentMethod === 'apple-pay' ? '<button class="apple-pay-btn" type="button" data-action="complete-apple-pay"> Pay</button><p class="payment-note">سيتم حفظ السيرة المعلقة تلقائياً بعد تأكيد الدفع.</p>' : '<div class="form-grid"><label>اسم حامل البطاقة<input required name="cardName" placeholder="الاسم كما يظهر على البطاقة"></label><label>رقم البطاقة<input required inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000"></label><label>تاريخ الانتهاء<input required placeholder="MM/YY"></label><label>CVV<input required inputmode="numeric" maxlength="4" placeholder="123"></label></div><button class="primary-btn" type="submit">دفع 49 ر.س</button>'}
+        </form>
+      </article>
+    </div>
   `);
 }
 
@@ -381,6 +436,7 @@ function render() {
   else if (parts[0] === 'builder' && parts[1]) app.innerHTML = builderPage(parts[1]);
   else if (path === '/dashboard') app.innerHTML = dashboardPage();
   else if (path === '/pricing') app.innerHTML = pricingPage();
+  else if (path === '/checkout') app.innerHTML = checkoutPage();
   else if (path === '/about') app.innerHTML = aboutPage();
   else if (path === '/contact') app.innerHTML = contactPage();
   else app.innerHTML = notFoundPage();
@@ -429,6 +485,9 @@ function bindPageEvents() {
 
   const contactForm = document.getElementById('contactForm');
   if (contactForm) contactForm.addEventListener('submit', e => { e.preventDefault(); e.target.reset(); showToast('تم استلام طلبك، سنعود إليك قريباً'); });
+
+  const paymentForm = document.getElementById('paymentForm');
+  if (paymentForm) paymentForm.addEventListener('submit', e => { e.preventDefault(); completeCheckout('card'); });
 }
 
 function handleAction(event) {
@@ -437,12 +496,22 @@ function handleAction(event) {
   const id = event.currentTarget.dataset.id;
   if (action === 'template-page') { state.templatePage = page; render(); return; }
   if (action === 'dashboard-page') { state.dashboardPage = page; render(); return; }
+  if (action === 'payment-method') { state.paymentMethod = event.currentTarget.dataset.method; render(); return; }
+  if (action === 'complete-apple-pay') { completeCheckout('apple-pay'); return; }
   if (action === 'edit-resume') { navigate(`/builder/${id}`); return; }
   const resumes = getSavedResumes();
   const resume = resumes.find(r => r.id === id);
   if (!resume) return;
   if (action === 'duplicate-resume') {
-    resumes.unshift({ ...resume, id: cryptoId(), name: `${resume.name} - نسخة`, status: 'مسودة', updatedAt: Date.now() });
+    const duplicate = { ...resume, id: cryptoId(), name: `${resume.name} - نسخة`, status: 'مسودة', updatedAt: Date.now() };
+    if (shouldChargeForNewResume()) {
+      localStorage.setItem('rawaj_pending_resume', JSON.stringify(duplicate));
+      showToast('تكرار السير بعد الأولى يتطلب الدفع');
+      navigate('/checkout');
+      return;
+    }
+    resumes.unshift(duplicate);
+    if (!isPaymentActive()) markFreeResumeUsed();
     saveResumes(resumes);
     showToast('تم تكرار السيرة بنجاح');
     render();
@@ -479,14 +548,41 @@ function saveResumeFromForm(event) {
   event.preventDefault();
   const data = Object.fromEntries(new FormData(event.target));
   const resumes = getSavedResumes();
+  const isNewResume = !data.id;
   const id = data.id || cryptoId();
   const record = { ...data, id, updatedAt: Date.now() };
+  if (isNewResume && shouldChargeForNewResume()) {
+    localStorage.setItem('rawaj_pending_resume', JSON.stringify(record));
+    showToast('السيرة الأولى مجانية؛ السير الإضافية تتطلب الدفع');
+    navigate('/checkout');
+    return;
+  }
   const index = resumes.findIndex(r => r.id === id);
   if (index >= 0) resumes[index] = record;
   else resumes.unshift(record);
+  if (isNewResume && !isPaymentActive()) markFreeResumeUsed();
   saveResumes(resumes);
-  showToast('تم حفظ السيرة في لوحة روَاج');
+  showToast(isNewResume && !isPaymentActive() ? 'تم حفظ سيرتك المجانية الأولى' : 'تم حفظ السيرة في لوحة روَاج');
   navigate('/dashboard');
+}
+
+function completeCheckout(method) {
+  localStorage.setItem('rawaj_payment_status', 'paid');
+  const pending = localStorage.getItem('rawaj_pending_resume');
+  if (pending) {
+    const resumes = getSavedResumes();
+    const record = JSON.parse(pending);
+    const index = resumes.findIndex(r => r.id === record.id);
+    if (index >= 0) resumes[index] = record;
+    else resumes.unshift(record);
+    saveResumes(resumes);
+    localStorage.removeItem('rawaj_pending_resume');
+    showToast(`تم الدفع عبر ${method === 'apple-pay' ? 'Apple Pay' : 'البطاقة'} وحفظ السيرة`);
+    navigate('/dashboard');
+    return;
+  }
+  showToast(`تم تفعيل الدفع عبر ${method === 'apple-pay' ? 'Apple Pay' : 'البطاقة'}`);
+  navigate('/builder');
 }
 
 function formatDate(timestamp) {
