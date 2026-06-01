@@ -569,7 +569,7 @@ function builderPage(editId = '') {
           ${textarea('التعليم والشهادات','education',data.education)}
           ${textarea('المهارات - افصل بينها بفواصل','skills',data.skills)}
           <label>حالة السيرة<select name="status"><option ${data.status==='جاهزة'?'selected':''}>جاهزة</option><option ${data.status==='مسودة'?'selected':''}>مسودة</option></select></label>
-          <div class="action-row"><button class="primary-btn" type="submit">حفظ السيرة</button><button class="secondary-btn" type="button" id="resetForm">مسح الحقول</button></div>
+          <div class="action-row"><button class="primary-btn" type="submit">حفظ السيرة</button><button class="secondary-btn" type="button" data-action="download-current-pdf">حفظ PDF</button><button class="secondary-btn" type="button" id="resetForm">مسح الحقول</button></div>
         </form>
       </article>
       <aside class="resume-preview reveal"><div class="preview-paper" id="resumePreview"></div></aside>
@@ -640,7 +640,7 @@ function dashboardPage() {
               <td>${templates.find(t=>t.id===r.template)?.name || 'قالب روَاج'}</td>
               <td><span class="status-pill ${r.status==='مسودة'?'draft':''}">${r.status}</span></td>
               <td>${formatDate(r.updatedAt)}</td>
-              <td><div class="action-row"><button class="mini-btn" data-action="preview-resume" data-id="${r.id}">معاينة</button><button class="mini-btn" data-action="edit-resume" data-id="${r.id}">تعديل</button><button class="mini-btn" data-action="duplicate-resume" data-id="${r.id}">تكرار</button><button class="mini-btn" data-action="delete-resume" data-id="${r.id}">حذف</button></div></td>
+              <td><div class="action-row"><button class="mini-btn" data-action="preview-resume" data-id="${r.id}">معاينة</button><button class="mini-btn" data-action="download-resume-pdf" data-id="${r.id}">PDF</button><button class="mini-btn" data-action="edit-resume" data-id="${r.id}">تعديل</button><button class="mini-btn" data-action="duplicate-resume" data-id="${r.id}">تكرار</button><button class="mini-btn" data-action="delete-resume" data-id="${r.id}">حذف</button></div></td>
             </tr>`).join('') || `<tr><td colspan="6"><div class="empty-state">لا توجد سير محفوظة مطابقة. أنشئ سيرة جديدة لتظهر هنا.</div></td></tr>`}
           </tbody>
         </table>
@@ -658,7 +658,7 @@ function savedPreviewPage(id) {
   return pageShell(`
     <div class="section-head reveal">
       <div><span class="eyebrow">معاينة السيرة المحفوظة</span><h2>${escapeHtml(resume.name)}</h2></div>
-      <div class="hero-actions"><a class="secondary-btn" href="/builder/${resume.id}" data-link>تعديل السيرة</a><a class="primary-btn" href="/dashboard" data-link>العودة للوحة</a></div>
+      <div class="hero-actions"><button class="secondary-btn" type="button" data-action="download-resume-pdf" data-id="${resume.id}">حفظ PDF</button><a class="secondary-btn" href="/builder/${resume.id}" data-link>تعديل السيرة</a><a class="primary-btn" href="/dashboard" data-link>العودة للوحة</a></div>
     </div>
     <div class="saved-preview-layout">
       <article class="resume-preview-page reveal" style="--accent:${template.accent}">
@@ -847,9 +847,18 @@ function render() {
   setActiveNav();
   bindPageEvents();
   revealVisible();
+  printPendingResumePdf();
   app.focus({ preventScroll: true });
   navLinks.classList.remove('open');
   menuToggle?.setAttribute('aria-expanded', 'false');
+}
+
+function printPendingResumePdf() {
+  const pendingPdfId = localStorage.getItem('rawaj_pending_pdf_resume');
+  if (!pendingPdfId || location.pathname !== `/preview/${pendingPdfId}`) return;
+  const resume = getSavedResumes().find(r => r.id === pendingPdfId);
+  localStorage.removeItem('rawaj_pending_pdf_resume');
+  if (resume) setTimeout(() => printResumePdf(resume.name || 'سيرة روَاج'), 180);
 }
 
 function bindPageEvents() {
@@ -914,6 +923,8 @@ function handleAction(event) {
   if (action === 'complete-apple-pay') { completeCheckout('apple-pay'); return; }
   if (action === 'send-receipt-email') { sendReceiptByEmail(); return; }
   if (action === 'clear-preview-prompt') { localStorage.removeItem('rawaj_last_saved_resume'); render(); return; }
+  if (action === 'download-current-pdf') { downloadCurrentResumePdf(); return; }
+  if (action === 'download-resume-pdf') { downloadSavedResumePdf(id); return; }
   if (action === 'preview-resume') { navigate(`/preview/${id}`); return; }
   if (action === 'edit-resume') { navigate(`/builder/${id}`); return; }
   const resumes = getSavedResumes();
@@ -1020,6 +1031,39 @@ function updatePreview() {
   const template = templates.find(t => t.id === data.template) || templates[0];
   preview.style.borderTop = `10px solid ${template.accent}`;
   preview.innerHTML = resumeDocumentHtml(data);
+}
+
+function downloadCurrentResumePdf() {
+  const form = document.getElementById('resumeForm');
+  const preview = document.getElementById('resumePreview');
+  if (!form || !preview) return;
+  updatePreview();
+  const data = Object.fromEntries(new FormData(form));
+  printResumePdf(data.name || 'سيرة روَاج');
+}
+
+function downloadSavedResumePdf(id) {
+  const resume = getSavedResumes().find(r => r.id === id);
+  if (!resume) return;
+  const previewPaper = document.querySelector('.preview-paper');
+  if (previewPaper && location.pathname === `/preview/${id}`) {
+    printResumePdf(resume.name || 'سيرة روَاج');
+    return;
+  }
+  localStorage.setItem('rawaj_pending_pdf_resume', id);
+  navigate(`/preview/${id}`);
+}
+
+function printResumePdf(title) {
+  const previousTitle = document.title;
+  document.title = `${title} - روَاج PDF`;
+  document.body.classList.add('print-resume');
+  showToast('اختر "حفظ كملف PDF" من نافذة الطباعة');
+  setTimeout(() => window.print(), 120);
+  setTimeout(() => {
+    document.body.classList.remove('print-resume');
+    document.title = previousTitle;
+  }, 900);
 }
 
 function resumeDocumentHtml(data) {
