@@ -325,7 +325,7 @@ h3 { font-size: 1.35rem; margin: 0 0 10px; }
   gap: 12px;
   margin: 22px 0 24px;
 }
-.control, .builder-form input, .builder-form textarea, .builder-form select, .contact-form input, .contact-form textarea, .contact-form select {
+.control, .builder-form input, .builder-form textarea, .builder-form select, .contact-form input, .contact-form textarea, .contact-form select, .payment-form input {
   width: 100%;
   border: 1px solid rgba(111,55,28,.18);
   background: rgba(255,250,240,.74);
@@ -335,7 +335,7 @@ h3 { font-size: 1.35rem; margin: 0 0 10px; }
   outline: none;
   transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
 }
-.control:focus, .builder-form input:focus, .builder-form textarea:focus, .builder-form select:focus, .contact-form input:focus, .contact-form textarea:focus, .contact-form select:focus {
+.control:focus, .builder-form input:focus, .builder-form textarea:focus, .builder-form select:focus, .contact-form input:focus, .contact-form textarea:focus, .contact-form select:focus, .payment-form input:focus {
   border-color: var(--teal);
   box-shadow: 0 0 0 5px rgba(13,93,86,.1);
   transform: translateY(-1px);
@@ -348,8 +348,23 @@ h3 { font-size: 1.35rem; margin: 0 0 10px; }
 .form-card, .table-card, .panel { padding: 24px; }
 .builder-form { display: grid; gap: 16px; }
 .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; }
-.builder-form label, .contact-form label { display: grid; gap: 8px; color: #4e4131; font-weight: 800; }
+.builder-form label, .contact-form label, .payment-form label { display: grid; gap: 8px; color: #4e4131; font-weight: 800; }
 .builder-form textarea, .contact-form textarea { min-height: 112px; resize: vertical; }
+.billing-alert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: -10px 0 22px;
+  padding: 16px 18px;
+  border-radius: 24px;
+  background: rgba(244,178,60,.14);
+  border: 1px solid rgba(181,99,42,.18);
+  color: var(--copper-deep);
+}
+.billing-alert strong { font-family: var(--font-display); font-size: 1.18rem; }
+.billing-alert span { color: var(--muted); }
+.billing-alert.paid { background: rgba(13,93,86,.1); color: var(--teal); border-color: rgba(13,93,86,.2); }
 .resume-preview {
   position: sticky;
   top: 116px;
@@ -385,6 +400,31 @@ td { color: #4e4131; }
 .price { font-family: var(--font-display); font-size: 3rem; margin: 16px 0; }
 .plan-card ul { list-style: none; padding: 0; margin: 20px 0; display: grid; gap: 12px; }
 .plan-card li::before { content: "✓"; color: var(--amber); margin-left: 8px; font-weight: 900; }
+.checkout-layout { display: grid; grid-template-columns: .9fr 1.1fr; gap: 22px; align-items: start; }
+.payment-methods { display: grid; gap: 12px; margin-top: 18px; }
+.payment-method {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 54px 1fr;
+  gap: 4px 12px;
+  text-align: right;
+  align-items: center;
+  padding: 16px;
+  border-radius: 22px;
+  border: 1px solid var(--line);
+  background: rgba(255,250,240,.62);
+  transition: .24s ease;
+}
+.payment-method span { grid-row: span 2; width: 54px; height: 54px; border-radius: 18px; display: grid; place-items: center; background: rgba(13,93,86,.1); color: var(--teal); font-size: 1.5rem; font-weight: 900; }
+.payment-method strong { color: var(--ink); }
+.payment-method small { color: var(--muted); line-height: 1.7; }
+.payment-method.active, .payment-method:hover, .payment-method:focus-visible { border-color: rgba(13,93,86,.38); box-shadow: var(--shadow); transform: translateY(-2px); outline: none; }
+.billing-summary { display: grid; grid-template-columns: 1fr auto; gap: 12px; margin-top: 18px; padding: 18px; border-radius: 22px; background: rgba(13,93,86,.07); color: var(--muted); }
+.billing-summary strong { color: var(--teal); }
+.payment-form { display: grid; gap: 16px; }
+.apple-pay-btn { min-height: 58px; border: 0; border-radius: 18px; background: #050505; color: #fff; font-size: 1.35rem; font-weight: 900; transition: .24s ease; }
+.apple-pay-btn:hover, .apple-pay-btn:focus-visible { transform: translateY(-2px); box-shadow: var(--shadow); outline: none; }
+.payment-note { color: var(--muted); line-height: 1.8; margin: 0; }
 
 .contact-layout { display: grid; grid-template-columns: .85fr 1.15fr; gap: 22px; }
 .contact-form { display: grid; gap: 14px; }
@@ -442,7 +482,7 @@ td { color: #4e4131; }
   .nav-links.open { display: flex; }
   .menu-toggle { display: block; }
   .nav-cta { display: none; }
-  .hero, .builder-layout, .contact-layout { grid-template-columns: 1fr; }
+  .hero, .builder-layout, .contact-layout, .checkout-layout { grid-template-columns: 1fr; }
   .depth-stage { min-height: 560px; }
   .resume-preview { position: relative; top: auto; }
   .footer-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
@@ -451,6 +491,7 @@ td { color: #4e4131; }
   .grid-3, .grid-2, .values-grid { grid-template-columns: 1fr; }
   .section-head { display: block; }
   .hero-metrics, .filters, .form-grid { grid-template-columns: 1fr; }
+  .billing-alert { align-items: stretch; flex-direction: column; }
   .cv-stack { transform: scale(.86); transform-origin: top center; }
   .depth-stage { min-height: 500px; }
   .page { padding-top: 32px; }
