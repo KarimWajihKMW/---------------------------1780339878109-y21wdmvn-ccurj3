@@ -640,7 +640,7 @@ function dashboardPage() {
               <td>${templates.find(t=>t.id===r.template)?.name || 'قالب روَاج'}</td>
               <td><span class="status-pill ${r.status==='مسودة'?'draft':''}">${r.status}</span></td>
               <td>${formatDate(r.updatedAt)}</td>
-              <td><div class="action-row"><button class="mini-btn" data-action="preview-resume" data-id="${r.id}">معاينة</button><button class="mini-btn" data-action="download-resume-pdf" data-id="${r.id}">PDF</button><button class="mini-btn" data-action="edit-resume" data-id="${r.id}">تعديل</button><button class="mini-btn" data-action="duplicate-resume" data-id="${r.id}">تكرار</button><button class="mini-btn" data-action="delete-resume" data-id="${r.id}">حذف</button></div></td>
+              <td><div class="action-row"><button class="mini-btn" data-action="preview-resume" data-id="${r.id}">معاينة</button><button class="mini-btn" data-action="download-resume-pdf" data-id="${r.id}">PDF</button><button class="mini-btn" data-action="share-resume-link" data-id="${r.id}">مشاركة الرابط</button><button class="mini-btn" data-action="edit-resume" data-id="${r.id}">تعديل</button><button class="mini-btn" data-action="duplicate-resume" data-id="${r.id}">تكرار</button><button class="mini-btn" data-action="delete-resume" data-id="${r.id}">حذف</button></div></td>
             </tr>`).join('') || `<tr><td colspan="6"><div class="empty-state">لا توجد سير محفوظة مطابقة. أنشئ سيرة جديدة لتظهر هنا.</div></td></tr>`}
           </tbody>
         </table>
@@ -658,7 +658,7 @@ function savedPreviewPage(id) {
   return pageShell(`
     <div class="section-head reveal">
       <div><span class="eyebrow">معاينة السيرة المحفوظة</span><h2>${escapeHtml(resume.name)}</h2></div>
-      <div class="hero-actions"><button class="secondary-btn" type="button" data-action="download-resume-pdf" data-id="${resume.id}">حفظ PDF</button><a class="secondary-btn" href="/builder/${resume.id}" data-link>تعديل السيرة</a><a class="primary-btn" href="/dashboard" data-link>العودة للوحة</a></div>
+      <div class="hero-actions"><button class="secondary-btn" type="button" data-action="download-resume-pdf" data-id="${resume.id}">حفظ PDF</button><button class="secondary-btn" type="button" data-action="share-resume-link" data-id="${resume.id}">مشاركة رابط السيرة</button><a class="secondary-btn" href="/builder/${resume.id}" data-link>تعديل السيرة</a><a class="primary-btn" href="/dashboard" data-link>العودة للوحة</a></div>
     </div>
     <div class="saved-preview-layout">
       <article class="resume-preview-page reveal" style="--accent:${template.accent}">
@@ -925,6 +925,7 @@ function handleAction(event) {
   if (action === 'clear-preview-prompt') { localStorage.removeItem('rawaj_last_saved_resume'); render(); return; }
   if (action === 'download-current-pdf') { downloadCurrentResumePdf(); return; }
   if (action === 'download-resume-pdf') { downloadSavedResumePdf(id); return; }
+  if (action === 'share-resume-link') { shareResumeLink(id); return; }
   if (action === 'preview-resume') { navigate(`/preview/${id}`); return; }
   if (action === 'edit-resume') { navigate(`/builder/${id}`); return; }
   const resumes = getSavedResumes();
@@ -1052,6 +1053,27 @@ function downloadSavedResumePdf(id) {
   }
   localStorage.setItem('rawaj_pending_pdf_resume', id);
   navigate(`/preview/${id}`);
+}
+
+async function shareResumeLink(id) {
+  const resume = getSavedResumes().find(r => r.id === id);
+  if (!resume) return;
+  const url = `${location.origin}/preview/${id}`;
+  const title = `سيرة ${resume.name || 'روَاج'}`;
+  const text = `رابط سيرة ${resume.name || 'ذاتية'} على روَاج`;
+
+  try {
+    if (navigator.share) {
+      await navigator.share({ title, text, url });
+      showToast('تم فتح خيارات مشاركة رابط السيرة');
+      return;
+    }
+    await navigator.clipboard.writeText(url);
+    showToast('تم نسخ رابط السيرة للمشاركة');
+  } catch (error) {
+    const fallback = prompt('انسخ رابط السيرة:', url);
+    if (fallback !== null) showToast('رابط السيرة جاهز للمشاركة');
+  }
 }
 
 function printResumePdf(title) {
