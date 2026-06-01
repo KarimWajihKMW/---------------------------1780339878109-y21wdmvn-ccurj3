@@ -325,7 +325,7 @@ h3 { font-size: 1.35rem; margin: 0 0 10px; }
   gap: 12px;
   margin: 22px 0 24px;
 }
-.control, .builder-form input, .builder-form textarea, .builder-form select, .contact-form input, .contact-form textarea, .contact-form select, .payment-form input {
+.control, .builder-form input, .builder-form textarea, .builder-form select, .contact-form input, .contact-form textarea, .contact-form select, .payment-form input, .receipt-email-form input {
   width: 100%;
   border: 1px solid rgba(111,55,28,.18);
   background: rgba(255,250,240,.74);
@@ -335,7 +335,7 @@ h3 { font-size: 1.35rem; margin: 0 0 10px; }
   outline: none;
   transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
 }
-.control:focus, .builder-form input:focus, .builder-form textarea:focus, .builder-form select:focus, .contact-form input:focus, .contact-form textarea:focus, .contact-form select:focus, .payment-form input:focus {
+.control:focus, .builder-form input:focus, .builder-form textarea:focus, .builder-form select:focus, .contact-form input:focus, .contact-form textarea:focus, .contact-form select:focus, .payment-form input:focus, .receipt-email-form input:focus {
   border-color: var(--teal);
   box-shadow: 0 0 0 5px rgba(13,93,86,.1);
   transform: translateY(-1px);
@@ -478,6 +478,9 @@ td { color: #4e4131; }
 .receipt-grid strong { color: var(--ink); }
 .receipt-actions { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
 .receipt-note p, .receipt-empty p { color: var(--muted); line-height: 1.8; }
+.receipt-email-box { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--line); }
+.receipt-email-form { display: grid; gap: 10px; margin-top: 12px; }
+.receipt-email-form input { direction: ltr; text-align: left; }
 
 .contact-layout { display: grid; grid-template-columns: .85fr 1.15fr; gap: 22px; }
 .contact-form { display: grid; gap: 14px; }
