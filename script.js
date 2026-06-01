@@ -545,6 +545,15 @@ function paymentReceiptPage() {
         <div class="billing-summary">
           <span>رقم المرجع</span><strong>${escapeHtml(receipt.id)}</strong>
           <span>حالة الحساب</span><strong>مفعّل</strong>
+          ${receipt.sentTo ? `<span>أُرسل إلى</span><strong>${escapeHtml(receipt.sentTo)}</strong>` : ''}
+        </div>
+        <div class="receipt-email-box">
+          <h3>إرسال الإيصال بالبريد</h3>
+          <p>أدخل بريدك ليتم تجهيز رسالة تحتوي على تفاصيل الإيصال ورقم المرجع.</p>
+          <div class="receipt-email-form">
+            <input id="receiptEmail" type="email" placeholder="you@example.com" value="${escapeAttr(receipt.customerEmail || receipt.sentTo || '')}" aria-label="البريد الإلكتروني لاستلام الإيصال">
+            <button class="primary-btn" type="button" data-action="send-receipt-email">إرسال الإيصال</button>
+          </div>
         </div>
       </aside>
     </div>
@@ -653,6 +662,7 @@ function handleAction(event) {
   if (action === 'dashboard-page') { state.dashboardPage = page; render(); return; }
   if (action === 'payment-method') { state.paymentMethod = event.currentTarget.dataset.method; render(); return; }
   if (action === 'complete-apple-pay') { completeCheckout('apple-pay'); return; }
+  if (action === 'send-receipt-email') { sendReceiptByEmail(); return; }
   if (action === 'clear-preview-prompt') { localStorage.removeItem('rawaj_last_saved_resume'); render(); return; }
   if (action === 'preview-resume') { navigate(`/preview/${id}`); return; }
   if (action === 'edit-resume') { navigate(`/builder/${id}`); return; }
@@ -760,10 +770,52 @@ function createPaymentReceipt(method, resume = null) {
     status: 'مدفوع بنجاح',
     resumeId: resume?.id || '',
     resumeName: resume?.name || '',
+    customerEmail: resume?.email || localStorage.getItem('rawaj_receipt_email') || '',
+    sentTo: '',
     createdAt: Date.now()
   };
   localStorage.setItem('rawaj_last_payment_receipt', JSON.stringify(receipt));
   return receipt;
+}
+
+function sendReceiptByEmail() {
+  const receipt = getLastPaymentReceipt();
+  const emailInput = document.getElementById('receiptEmail');
+  const email = emailInput?.value.trim() || '';
+  if (!receipt || !email) {
+    showToast('أدخل بريداً إلكترونياً صالحاً لإرسال الإيصال');
+    emailInput?.focus();
+    return;
+  }
+  if (!emailInput.checkValidity()) {
+    showToast('صيغة البريد الإلكتروني غير صحيحة');
+    emailInput.focus();
+    return;
+  }
+
+  const updatedReceipt = { ...receipt, customerEmail: email, sentTo: email };
+  localStorage.setItem('rawaj_receipt_email', email);
+  localStorage.setItem('rawaj_last_payment_receipt', JSON.stringify(updatedReceipt));
+
+  const subject = `إيصال دفع روَاج ${receipt.id}`;
+  const body = [
+    'مرحباً،',
+    '',
+    'هذا إيصال دفعك في منصة روَاج:',
+    `رقم المرجع: ${receipt.id}`,
+    `المبلغ: ${receipt.amount}`,
+    `طريقة الدفع: ${formatReceiptMethod(receipt.method)}`,
+    `الخطة: ${receipt.plan}`,
+    `السيرة المرتبطة: ${receipt.resumeName || 'تفعيل عام للحساب'}`,
+    `تاريخ العملية: ${formatDate(receipt.createdAt)}`,
+    `الحالة: ${receipt.status}`,
+    '',
+    'شكراً لاستخدامك روَاج.'
+  ].join('\n');
+
+  window.location.href = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  showToast('تم تجهيز رسالة الإيصال في تطبيق البريد');
+  render();
 }
 
 function getLastPaymentReceipt() {
