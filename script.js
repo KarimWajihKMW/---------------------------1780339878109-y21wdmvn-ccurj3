@@ -81,6 +81,19 @@ templates.push(
   { id: 'manufacturing-line', name: 'خط التصنيع', category: 'تصنيع', tone: 'عملي', popularity: 84, accent: '#475569', pages: 'صفحتان', desc: 'يركز على الإنتاجية، السلامة، الصيانة، وتقليل الهدر.', tags: ['إنتاج', 'سلامة', 'صيانة'] }
 );
 
+const canvaInspiredTemplates = [
+  { id: 'canva-golden-portfolio', name: 'بورتفوليو ذهبي', category: 'كانفا', tone: 'فاخر', popularity: 99, accent: '#b8860b', accent2: '#111827', pages: 'صفحة واحدة', desc: 'قالب بصري بلمسات ذهبية ومساحات صور كبيرة مناسب للمبدعين والملفات التعريفية.', tags: ['Canva', 'ذهبي', 'Portfolio'], avatarText: 'ذه', shape: 'canvas', layout: 'poster', canvasStyle: 'gold' },
+  { id: 'canva-wave-profile', name: 'ملف موج البحر', category: 'كانفا', tone: 'حديث', popularity: 98, accent: '#0891b2', accent2: '#0f766e', pages: 'صفحة واحدة', desc: 'تدرجات بحرية وخطوط منحنية تمنح السيرة حضوراً عصرياً واضحاً وسريع القراءة.', tags: ['Canva', 'موجات', 'حديث'], avatarText: 'مو', shape: 'canvas', layout: 'poster', canvasStyle: 'wave' },
+  { id: 'canva-rose-editorial', name: 'تحرير وردي', category: 'كانفا', tone: 'إبداعي', popularity: 97, accent: '#e11d48', accent2: '#f97316', pages: 'صفحة واحدة', desc: 'تكوين تحريري جريء للمسوقين وصناع المحتوى مع بطاقات إنجازات لافتة.', tags: ['Canva', 'تحريري', 'ألوان'], avatarText: 'ور', shape: 'canvas', layout: 'split', canvasStyle: 'rose' },
+  { id: 'canva-minimal-beige', name: 'بيج مينيمال', category: 'كانفا', tone: 'هادئ', popularity: 96, accent: '#9a6b3f', accent2: '#d6b48a', pages: 'صفحتان', desc: 'تصميم هادئ بألوان طبيعية ومسافات بيضاء واسعة يناسب التقديم الرسمي الأنيق.', tags: ['Canva', 'Minimal', 'راقي'], avatarText: 'بي', shape: 'canvas', layout: 'split', canvasStyle: 'beige' },
+  { id: 'canva-neon-tech', name: 'تقني نيون', category: 'كانفا', tone: 'مستقبلي', popularity: 98, accent: '#7c3aed', accent2: '#06b6d4', pages: 'صفحتان', desc: 'أسلوب تقني داكن مع أضواء نيون لإبراز المشاريع والمهارات الرقمية.', tags: ['Canva', 'Neon', 'Tech'], avatarText: 'ني', shape: 'canvas', layout: 'poster', canvasStyle: 'neon' },
+  { id: 'canva-grid-agency', name: 'شبكة الوكالة', category: 'كانفا', tone: 'منظم', popularity: 95, accent: '#2563eb', accent2: '#f59e0b', pages: 'صفحة واحدة', desc: 'شبكة بطاقات عملية للوكالات والاستشاريين تعرض الخدمات والنتائج بطريقة منظمة.', tags: ['Canva', 'شبكة', 'Agency'], avatarText: 'وك', shape: 'canvas', layout: 'grid', canvasStyle: 'grid' },
+  { id: 'canva-organic-coach', name: 'عضوي للمدربين', category: 'كانفا', tone: 'ودود', popularity: 94, accent: '#65a30d', accent2: '#f4b23c', pages: 'صفحة واحدة', desc: 'أشكال عضوية دافئة للمدربين والمستشارين مع إبراز البرامج والأثر.', tags: ['Canva', 'عضوي', 'تدريب'], avatarText: 'عض', shape: 'canvas', layout: 'poster', canvasStyle: 'organic' },
+  { id: 'canva-monochrome-pro', name: 'أبيض وأسود احترافي', category: 'كانفا', tone: 'رسمي', popularity: 97, accent: '#111827', accent2: '#6b7280', pages: 'صفحتان', desc: 'قالب عالي التباين بأسلوب مجلات الأعمال للمناصب القيادية والاستشارية.', tags: ['Canva', 'Monochrome', 'رسمي'], avatarText: 'BW', shape: 'canvas', layout: 'split', canvasStyle: 'mono' }
+];
+
+templates.push(...canvaInspiredTemplates);
+
 const templateShapeStyles = [
   { key: 'folio', label: 'ورقي', tone: 'رسمي', pages: 'صفحة واحدة' },
   { key: 'arch', label: 'قوسي', tone: 'راقي', pages: 'صفحتان' },
@@ -354,10 +367,12 @@ function templateCard(t) {
   const shape = t.shape || 'folio';
   const layout = t.layout || 'stacked';
   const favorite = isTemplateFavorite(t.id);
-  return `<article class="template-card reveal">
-    <div class="template-preview">
-      <div class="template-mini shape-${shape} layout-${layout}" style="--accent:${t.accent}">
+  const isCanvasTemplate = Boolean(t.canvasStyle);
+  return `<article class="template-card reveal ${isCanvasTemplate ? 'canva-template-card' : ''}">
+    <div class="template-preview ${isCanvasTemplate ? 'canva-template-preview' : ''}" style="--accent:${t.accent}; --accent-2:${t.accent2 || t.accent}">
+      <div class="template-mini shape-${shape} layout-${layout} ${isCanvasTemplate ? `canvas-style canvas-${t.canvasStyle}` : ''}" style="--accent:${t.accent}; --accent-2:${t.accent2 || t.accent}">
         <div class="top"><img class="template-avatar" src="${avatar}" alt="صورة رمزية لقالب ${escapeAttr(t.name)}"></div>
+        ${isCanvasTemplate ? '<span class="canvas-dot dot-one"></span><span class="canvas-dot dot-two"></span><span class="canvas-ribbon"></span><div class="canvas-photo"></div>' : ''}
         <div class="row"></div><div class="row"></div><div class="row"></div><div class="row"></div>
       </div>
     </div>
