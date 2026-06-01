@@ -495,9 +495,58 @@ function checkoutPage() {
       <article class="form-card reveal">
         <form class="payment-form" id="paymentForm">
           <h3>${state.paymentMethod === 'apple-pay' ? 'الدفع عبر Apple Pay' : 'إضافة بطاقة بنكية'}</h3>
-          ${state.paymentMethod === 'apple-pay' ? '<button class="apple-pay-btn" type="button" data-action="complete-apple-pay"> Pay</button><p class="payment-note">سيتم حفظ السيرة المعلقة تلقائياً بعد تأكيد الدفع.</p>' : '<div class="form-grid"><label>اسم حامل البطاقة<input required name="cardName" placeholder="الاسم كما يظهر على البطاقة"></label><label>رقم البطاقة<input required inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000"></label><label>تاريخ الانتهاء<input required placeholder="MM/YY"></label><label>CVV<input required inputmode="numeric" maxlength="4" placeholder="123"></label></div><button class="primary-btn" type="submit">دفع 49 ر.س</button>'}
+          ${state.paymentMethod === 'apple-pay' ? '<button class="apple-pay-btn" type="button" data-action="complete-apple-pay"> Pay</button><p class="payment-note">سيظهر إيصال الدفع مباشرة بعد تأكيد العملية مع حفظ السيرة المعلقة تلقائياً.</p>' : '<div class="form-grid"><label>اسم حامل البطاقة<input required name="cardName" placeholder="الاسم كما يظهر على البطاقة"></label><label>رقم البطاقة<input required inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000"></label><label>تاريخ الانتهاء<input required placeholder="MM/YY"></label><label>CVV<input required inputmode="numeric" maxlength="4" placeholder="123"></label></div><button class="primary-btn" type="submit">دفع 49 ر.س واستلام الإيصال</button>'}
         </form>
       </article>
+    </div>
+  `);
+}
+
+function paymentReceiptPage() {
+  const receipt = getLastPaymentReceipt();
+  if (!receipt) {
+    return pageShell(`
+      <article class="panel reveal receipt-empty">
+        <span class="eyebrow">إيصال الدفع</span>
+        <h2>لا يوجد إيصال محفوظ حالياً.</h2>
+        <p class="lead">أكمل عملية الدفع أولاً ليظهر إيصال العملية هنا تلقائياً.</p>
+        <a class="primary-btn" href="/checkout" data-link>الذهاب للدفع</a>
+      </article>
+    `);
+  }
+  return pageShell(`
+    <div class="receipt-layout">
+      <article class="payment-receipt reveal">
+        <div class="receipt-top">
+          <div>
+            <span class="eyebrow">إيصال دفع</span>
+            <h2>تم إكمال العملية بنجاح</h2>
+            <p>احتفظ بهذا الإيصال كمرجع لتفعيل إنشاء السير الإضافية في روَاج.</p>
+          </div>
+          <div class="receipt-status">مدفوع</div>
+        </div>
+        <div class="receipt-number">${escapeHtml(receipt.id)}</div>
+        <div class="receipt-grid">
+          <div><span>المبلغ</span><strong>${escapeHtml(receipt.amount)}</strong></div>
+          <div><span>طريقة الدفع</span><strong>${escapeHtml(formatReceiptMethod(receipt.method))}</strong></div>
+          <div><span>تاريخ العملية</span><strong>${escapeHtml(formatDate(receipt.createdAt))}</strong></div>
+          <div><span>الخطة</span><strong>${escapeHtml(receipt.plan)}</strong></div>
+          <div><span>السيرة المرتبطة</span><strong>${escapeHtml(receipt.resumeName || 'تفعيل عام للحساب')}</strong></div>
+          <div><span>الحالة</span><strong>${escapeHtml(receipt.status)}</strong></div>
+        </div>
+        <div class="receipt-actions">
+          <a class="primary-btn" href="/dashboard" data-link>العودة للوحة السير</a>
+          <a class="secondary-btn" href="/builder" data-link>إنشاء سيرة أخرى</a>
+        </div>
+      </article>
+      <aside class="panel reveal receipt-note">
+        <h3>ماذا بعد الدفع؟</h3>
+        <p>تم تفعيل الدفع على هذا المتصفح، ويمكنك الآن حفظ السير الإضافية أو متابعة تعديل السيرة التي كانت معلقة قبل الدفع.</p>
+        <div class="billing-summary">
+          <span>رقم المرجع</span><strong>${escapeHtml(receipt.id)}</strong>
+          <span>حالة الحساب</span><strong>مفعّل</strong>
+        </div>
+      </aside>
     </div>
   `);
 }
@@ -542,6 +591,7 @@ function render() {
   else if (parts[0] === 'preview' && parts[1]) app.innerHTML = savedPreviewPage(parts[1]);
   else if (path === '/pricing') app.innerHTML = pricingPage();
   else if (path === '/checkout') app.innerHTML = checkoutPage();
+  else if (path === '/receipt') app.innerHTML = paymentReceiptPage();
   else if (path === '/about') app.innerHTML = aboutPage();
   else if (path === '/contact') app.innerHTML = contactPage();
   else app.innerHTML = notFoundPage();
@@ -691,12 +741,38 @@ function completeCheckout(method) {
     saveResumes(resumes);
     localStorage.setItem('rawaj_last_saved_resume', record.id);
     localStorage.removeItem('rawaj_pending_resume');
-    showToast(`تم الدفع عبر ${method === 'apple-pay' ? 'Apple Pay' : 'البطاقة'} وحفظ السيرة؛ المعاينة متاحة الآن`);
-    navigate('/dashboard');
+    createPaymentReceipt(method, record);
+    showToast(`تم الدفع عبر ${method === 'apple-pay' ? 'Apple Pay' : 'البطاقة'} وحفظ السيرة؛ الإيصال جاهز الآن`);
+    navigate('/receipt');
     return;
   }
-  showToast(`تم تفعيل الدفع عبر ${method === 'apple-pay' ? 'Apple Pay' : 'البطاقة'}`);
-  navigate('/builder');
+  createPaymentReceipt(method);
+  showToast(`تم تفعيل الدفع عبر ${method === 'apple-pay' ? 'Apple Pay' : 'البطاقة'}؛ الإيصال جاهز الآن`);
+  navigate('/receipt');
+}
+
+function createPaymentReceipt(method, resume = null) {
+  const receipt = {
+    id: `RAWAJ-${Date.now().toString(36).toUpperCase()}`,
+    method,
+    amount: '49 ر.س',
+    plan: 'المحترف - سير إضافية',
+    status: 'مدفوع بنجاح',
+    resumeId: resume?.id || '',
+    resumeName: resume?.name || '',
+    createdAt: Date.now()
+  };
+  localStorage.setItem('rawaj_last_payment_receipt', JSON.stringify(receipt));
+  return receipt;
+}
+
+function getLastPaymentReceipt() {
+  const receipt = localStorage.getItem('rawaj_last_payment_receipt');
+  return receipt ? JSON.parse(receipt) : null;
+}
+
+function formatReceiptMethod(method) {
+  return method === 'apple-pay' ? 'Apple Pay' : 'بطاقة بنكية';
 }
 
 function formatDate(timestamp) {
