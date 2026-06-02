@@ -234,6 +234,7 @@ const app = document.getElementById('app');
 const toast = document.getElementById('toast');
 const navLinks = document.getElementById('navLinks');
 const menuToggle = document.getElementById('menuToggle');
+const navBackdrop = document.getElementById('navBackdrop');
 const themeToggle = document.getElementById('themeToggle');
 const themeToggleLabel = document.getElementById('themeToggleLabel');
 const authNavLink = document.getElementById('authNavLink');
@@ -1949,6 +1950,7 @@ window.addEventListener('scroll', () => {
 window.addEventListener('popstate', render);
 function closeMobileNav() {
   navLinks?.classList.remove('open');
+  document.body.classList.remove('mobile-nav-open');
   menuToggle?.setAttribute('aria-expanded', 'false');
   menuToggle?.setAttribute('aria-label', 'فتح القائمة');
 }
@@ -1956,6 +1958,7 @@ function closeMobileNav() {
 function toggleMobileNav() {
   if (!navLinks || !menuToggle) return;
   const open = navLinks.classList.toggle('open');
+  document.body.classList.toggle('mobile-nav-open', open);
   menuToggle.setAttribute('aria-expanded', String(open));
   menuToggle.setAttribute('aria-label', open ? 'إغلاق القائمة' : 'فتح القائمة');
 }
@@ -1964,6 +1967,8 @@ menuToggle?.addEventListener('click', event => {
   event.stopPropagation();
   toggleMobileNav();
 });
+
+navBackdrop?.addEventListener('click', closeMobileNav);
 
 document.addEventListener('click', event => {
   if (!navLinks?.classList.contains('open')) return;
