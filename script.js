@@ -1341,8 +1341,7 @@ function render() {
   revealVisible();
   printPendingResumePdf();
   app.focus({ preventScroll: true });
-  navLinks.classList.remove('open');
-  menuToggle?.setAttribute('aria-expanded', 'false');
+  closeMobileNav();
 }
 
 function printPendingResumePdf() {
@@ -1948,10 +1947,39 @@ window.addEventListener('scroll', () => {
   document.documentElement.style.setProperty('--scrollY', scrollY);
 });
 window.addEventListener('popstate', render);
-menuToggle?.addEventListener('click', () => {
+function closeMobileNav() {
+  navLinks?.classList.remove('open');
+  menuToggle?.setAttribute('aria-expanded', 'false');
+  menuToggle?.setAttribute('aria-label', 'فتح القائمة');
+}
+
+function toggleMobileNav() {
+  if (!navLinks || !menuToggle) return;
   const open = navLinks.classList.toggle('open');
   menuToggle.setAttribute('aria-expanded', String(open));
+  menuToggle.setAttribute('aria-label', open ? 'إغلاق القائمة' : 'فتح القائمة');
+}
+
+menuToggle?.addEventListener('click', event => {
+  event.stopPropagation();
+  toggleMobileNav();
 });
+
+document.addEventListener('click', event => {
+  if (!navLinks?.classList.contains('open')) return;
+  const target = event.target instanceof Element ? event.target : event.target?.parentElement;
+  if (target?.closest('.nav-shell')) return;
+  closeMobileNav();
+});
+
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape') closeMobileNav();
+});
+
+window.addEventListener('resize', () => {
+  if (window.innerWidth > 1024) closeMobileNav();
+});
+
 themeToggle?.addEventListener('click', toggleThemePalette);
 
 document.addEventListener('DOMContentLoaded', render);
