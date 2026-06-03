@@ -378,7 +378,7 @@ function navigate(path) {
   const targetUrl = new URL(path, location.origin);
   if (isProtectedPath(targetUrl.pathname) && !getCurrentUser()) {
     localStorage.setItem('rawaj_auth_redirect', `${targetUrl.pathname}${targetUrl.search}`);
-    showToast('سجّل الدخول أولاً للوصول إلى لوحة السير أو منشئ السيرة الذاتية');
+    showToast('سجّل الدخول أولاً لاستخدام موقع روَاج');
     history.pushState({}, '', '/auth');
     render();
     return;
@@ -399,8 +399,14 @@ function isSettingsPath(path) {
   return path === '/settings';
 }
 
+const publicPaths = ['/auth', '/terms', '/privacy'];
+
+function isPublicPath(path) {
+  return publicPaths.includes(path);
+}
+
 function isProtectedPath(path) {
-  return isBuilderPath(path) || isDashboardPath(path) || isSettingsPath(path);
+  return !isPublicPath(path);
 }
 
 function consumeAuthRedirect() {
@@ -1286,23 +1292,32 @@ function contactPage() {
 
 function loginRequiredPage() {
   const redirectPath = `${location.pathname}${location.search}`;
-  localStorage.setItem('rawaj_auth_redirect', redirectPath);
+  if (!isPublicPath(location.pathname)) localStorage.setItem('rawaj_auth_redirect', redirectPath);
   const isDashboard = isDashboardPath(location.pathname);
   const isSettings = isSettingsPath(location.pathname);
-  const title = isDashboard ? 'سجّل دخولك قبل فتح لوحة السير.' : isSettings ? 'سجّل دخولك قبل إدارة إعدادات الحساب.' : 'سجّل دخولك قبل إنشاء السيرة الذاتية.';
+  const isBuilder = isBuilderPath(location.pathname);
+  const title = isDashboard
+    ? 'سجّل دخولك قبل فتح لوحة السير.'
+    : isSettings
+      ? 'سجّل دخولك قبل إدارة إعدادات الحساب.'
+      : isBuilder
+        ? 'سجّل دخولك قبل إنشاء السيرة الذاتية.'
+        : 'التسجيل مطلوب قبل استخدام موقع روَاج.';
   const message = isDashboard
     ? 'لوحة السير تحتوي على سيرك المحفوظة وإجراءات التعديل والمعاينة، لذلك يجب تسجيل الدخول قبل الوصول إليها.'
     : isSettings
       ? 'إعدادات الحساب تحتوي على بياناتك وتفضيلاتك الشخصية، لذلك يجب تسجيل الدخول قبل تعديلها.'
-      : 'حماية إنشاء السير تضمن حفظ بياناتك وقوالبك داخل حساب روَاج، ثم يمكنك العودة مباشرة إلى منشئ السيرة بعد التسجيل.';
+      : isBuilder
+        ? 'حماية إنشاء السير تضمن حفظ بياناتك وقوالبك داخل حساب روَاج، ثم يمكنك العودة مباشرة إلى منشئ السيرة بعد التسجيل.'
+        : 'لا يمكن استخدام صفحات وخدمات روَاج إلا بعد إنشاء حساب أو تسجيل الدخول عبر البريد الإلكتروني أو Google أو Apple.';
   return pageShell(`
     <article class="panel reveal" style="max-width:760px;margin:auto;text-align:center">
       <span class="eyebrow">تسجيل الدخول مطلوب</span>
       <h2>${title}</h2>
       <p class="lead" style="margin-inline:auto">${message}</p>
       <div class="hero-actions" style="justify-content:center">
-        <a class="primary-btn" href="/auth" data-link>تسجيل الدخول أو إنشاء حساب</a>
-        <a class="secondary-btn" href="/templates" data-link>استعراض القوالب أولاً</a>
+        <a class="primary-btn" href="/auth" data-link>التسجيل بالبريد أو Google أو Apple</a>
+        <a class="secondary-btn" href="/terms" data-link>قراءة الشروط أولاً</a>
       </div>
     </article>
   `);
@@ -1315,6 +1330,18 @@ function notFoundPage() {
 function render() {
   const path = location.pathname.replace(/\/$/, '') || '/';
   const parts = path.split('/').filter(Boolean);
+
+  if (isProtectedPath(path) && !getCurrentUser()) {
+    app.innerHTML = loginRequiredPage();
+    setActiveNav();
+    updateAuthNavState();
+    bindPageEvents();
+    revealVisible();
+    app.focus({ preventScroll: true });
+    closeMobileNav();
+    return;
+  }
+
   if (path === '/') app.innerHTML = homePage();
   else if (path === '/templates') app.innerHTML = templatesPage();
   else if (parts[0] === 'templates' && parts[1]) app.innerHTML = templateDetailPage(parts[1]);
